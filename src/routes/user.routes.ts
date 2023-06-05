@@ -15,6 +15,11 @@ export const userRoutes = () => {
     );
     app.put('/:id', new UserController().update);
     app.delete('/:id', new UserController().delete);
+    app.post(
+        '/login',
+        [UserMiddleware.validateFieldsLogin],
+        new UserController().login
+    );
 
     app.use('/:id/errand', errandRoutes());
     return app;

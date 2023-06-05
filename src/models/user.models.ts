@@ -1,9 +1,9 @@
 import { v4 as createId } from 'uuid';
-import { Errands } from './errand.models';
+import { Errand } from './errand.models';
 
 export class User {
     private _id: string;
-    private _errand: Errands[];
+    private _errand: Errand[];
 
     constructor(
         private _name: string,

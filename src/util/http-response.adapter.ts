@@ -30,6 +30,13 @@ export class ApiResponse {
         });
     }
 
+    public static invalidCredentials(res: Response) {
+        return res.status(400).send({
+            ok: false,
+            message: 'Unauthorized access',
+        });
+    }
+
     public static serverError(res: Response, error: any) {
         return res.status(500).send({
             ok: false,

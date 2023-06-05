@@ -10,6 +10,10 @@ export class UserRepository {
         return users.find((user) => user.id === id);
     }
 
+    public getByEmail(email: string) {
+        return users.find((user) => user.email === email);
+    }
+
     public create(user: User) {
         return users.push(user);
     }

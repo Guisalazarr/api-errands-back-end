@@ -116,4 +116,23 @@ export class UserController {
             return ApiResponse.serverError(res, error);
         }
     }
+
+    public login(req: Request, res: Response) {
+        const { email, password } = req.body;
+
+        const user = new UserRepository().getByEmail(email);
+
+        if (!user) {
+            return ApiResponse.invalidCredentials(res);
+        }
+
+        if (user.password !== password) {
+            return ApiResponse.invalidCredentials(res);
+        }
+
+        return ApiResponse.success(res, 'Login successfully done', {
+            id: user.id,
+            name: user.name,
+        });
+    }
 }
