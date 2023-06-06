@@ -13,4 +13,4 @@ export const users = [
 users[0].errand.push(new Errand('Mercado', 'Fazer compras'));
 users[0].errand.push(new Errand('Lavar', 'Casa de praia'));
 users[1].errand.push(new Errand('Cachorro', 'Levar para passear'));
-users[1].errand.push(new Errand('Luz', 'Trocar a lampâda da cozinha'));
+users[2].errand.push(new Errand('Luz', 'Trocar a lampâda da cozinha'));
