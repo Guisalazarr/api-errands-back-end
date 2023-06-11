@@ -35,9 +35,6 @@ export class User {
     public set name(name: string) {
         this._name = name;
     }
-    public set email(email: string) {
-        this.email = email;
-    }
 
     public toJson() {
         return {

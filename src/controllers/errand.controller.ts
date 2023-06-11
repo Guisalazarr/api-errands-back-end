@@ -114,6 +114,7 @@ export class ErrandController {
             }
 
             const errand = new ErrandRepository().get(user, errandId);
+
             if (!errand) {
                 return ApiResponse.notFound(res, 'Errand');
             }

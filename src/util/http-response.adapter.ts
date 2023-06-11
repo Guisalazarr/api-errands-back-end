@@ -31,7 +31,7 @@ export class ApiResponse {
     }
 
     public static invalidCredentials(res: Response) {
-        return res.status(400).send({
+        return res.status(401).send({
             ok: false,
             message: 'Unauthorized access',
         });
