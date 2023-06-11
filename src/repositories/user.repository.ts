@@ -2,6 +2,10 @@ import { users } from '../database/users';
 import { User } from '../models/user.models';
 
 export class UserRepository {
+    public list() {
+        return users;
+    }
+
     public get(id: string) {
         return users.find((user) => user.id === id);
     }

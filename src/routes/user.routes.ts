@@ -6,6 +6,9 @@ import { errandRoutes } from './errand.routes';
 export const userRoutes = () => {
     const app = Router();
 
+    app.get('/', new UserController().list);
+    app.get('/:id', new UserController().get);
+
     app.post(
         '/',
         [UserMiddleware.validateCreateFields],

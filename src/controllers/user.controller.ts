@@ -4,6 +4,20 @@ import { UserRepository } from '../repositories/user.repository';
 import { User } from '../models/user.models';
 
 export class UserController {
+    public list(req: Request, res: Response) {
+        try {
+            const users = new UserRepository().list();
+
+            return ApiResponse.success(
+                res,
+                'Users were successfully listed',
+                users.map((user) => user.toJson())
+            );
+        } catch (error: any) {
+            return ApiResponse.serverError(res, error);
+        }
+    }
+
     public get(req: Request, res: Response) {
         try {
             const { id } = req.params;
