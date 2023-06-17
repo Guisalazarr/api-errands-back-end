@@ -11,10 +11,7 @@ export const errandRoutes = () => {
     app.get('/:errandId', new ErrandController().get);
     app.post(
         '/',
-        [
-            ErrandMiddleware.validateCreateFields,
-            ErrandMiddleware.validateStatusErrand,
-        ],
+        [ErrandMiddleware.validateCreateFields],
         new ErrandController().create
     );
     app.put(
