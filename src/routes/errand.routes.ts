@@ -11,10 +11,17 @@ export const errandRoutes = () => {
     app.get('/:errandId', new ErrandController().get);
     app.post(
         '/',
-        [ErrandMiddleware.validateCreateFields],
+        [
+            ErrandMiddleware.validateCreateFields,
+            ErrandMiddleware.validateStatusErrand,
+        ],
         new ErrandController().create
     );
-    app.put('/:errandId', new ErrandController().update);
+    app.put(
+        '/:errandId',
+        [ErrandMiddleware.validateStatusErrand],
+        new ErrandController().update
+    );
 
     app.delete('/:errandId', new ErrandController().delete);
 
