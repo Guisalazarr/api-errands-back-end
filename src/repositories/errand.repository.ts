@@ -1,9 +1,19 @@
-import { Errand } from '../models/errand.models';
+import { Errand, ErrandStatus } from '../models/errand.models';
 import { User } from '../models/user.models';
 
+interface ListErrandsParams {
+    user: User;
+    title?: string;
+    status?: ErrandStatus;
+}
+
 export class ErrandRepository {
-    public list(user: User, title?: string) {
-        return user.errand.filter((errand) => !title || errand.title === title);
+    public list(params: ListErrandsParams) {
+        return params.user.errand.filter(
+            (errand) =>
+                (!params.title || errand.title === params.title) &&
+                (!params.status || errand.status === params.status)
+        );
     }
 
     public get(user: User, errandId: string) {

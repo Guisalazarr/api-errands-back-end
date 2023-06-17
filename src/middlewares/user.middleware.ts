@@ -10,6 +10,8 @@ export class UserMiddleware {
         try {
             const { name, email, password, repeatPassword } = req.body;
 
+            const validEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+
             if (!name) {
                 return ApiResponse.notProvided(res, 'Name');
             }
@@ -29,6 +31,10 @@ export class UserMiddleware {
                 );
             }
 
+            if (!email.match(validEmail)) {
+                return ApiResponse.invalidField(res, 'Email');
+            }
+
             next();
         } catch (error: any) {
             return ApiResponse.serverError(res, error);
@@ -41,12 +47,17 @@ export class UserMiddleware {
     ) {
         try {
             const { email, password } = req.body;
+            const validEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
             if (!email) {
                 return ApiResponse.notProvided(res, 'Email');
             }
             if (!password) {
                 return ApiResponse.notProvided(res, 'Password');
+            }
+
+            if (!email.match(validEmail)) {
+                return ApiResponse.invalidField(res, 'Email');
             }
 
             next();
