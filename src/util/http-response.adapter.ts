@@ -44,7 +44,7 @@ export class ApiResponse {
         });
     }
 
-    // Sucess Request ------------------------------------------
+    // Success Request ------------------------------------------
 
     public static success(res: Response, message: string, data: any) {
         return res.status(200).send({
