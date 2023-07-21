@@ -1,37 +1,76 @@
+import { Database } from '../database/config/database.connection';
+import { ErrandEntity } from '../database/entities/errand.entity';
 import { Errand, ErrandStatus } from '../models/errand.models';
-import { User } from '../models/user.models';
+import { UserRepository } from './user.repository';
 
 interface ListErrandsParams {
-    user: User;
+    userId: string;
     title?: string;
     status?: ErrandStatus;
 }
 
 export class ErrandRepository {
-    public list(params: ListErrandsParams) {
-        return params.user.errand.filter(
-            (errand) =>
-                (!params.title || errand.title === params.title) &&
-                (!params.status || errand.status === params.status)
-        );
+    private repository = Database.connection.getRepository(ErrandEntity);
+
+    public async list(params: ListErrandsParams) {
+        const result = await this.repository.find({
+            where: {
+                idUser: params.userId,
+                title: params.title,
+                status: params.status,
+            },
+            relations: {
+                user: true,
+            },
+        });
+        return result.map((row) => this.mapRowToModel(row));
     }
 
-    public get(user: User, errandId: string) {
-        return user.errand.find((errand) => errand.id === errandId);
-    }
+    public async get(errandId: string) {
+        const result = await this.repository.findOneBy({
+            id: errandId,
+        });
 
-    public create(user: User, errand: Errand) {
-        user.errand.push(errand);
-    }
-
-    public delete(user: User, errandId: string) {
-        const findIndex = user.errand.findIndex(
-            (errand) => errand.id === errandId
-        );
-
-        if (findIndex < 0) {
-            return false;
+        if (!result) {
+            return undefined;
         }
-        return user.errand.splice(findIndex, 1);
+        return this.mapRowToModel(result);
+    }
+
+    public async create(errand: Errand) {
+        const errandEntity = this.repository.create({
+            id: errand.id,
+            title: errand.title,
+            status: errand.status,
+            description: errand.description,
+            idUser: errand.user.id,
+        });
+
+        await this.repository.save(errandEntity);
+    }
+
+    public async delete(errandId: string) {
+        const result = await this.repository.delete(errandId);
+
+        return result.affected ?? 0;
+    }
+
+    public async update(errand: Errand) {
+        await this.repository.update(
+            {
+                id: errand.id,
+            },
+            {
+                title: errand.title,
+                description: errand.description,
+                status: errand.status,
+            }
+        );
+    }
+
+    private mapRowToModel(row: ErrandEntity) {
+        const user = UserRepository.mapRowToModel(row.user);
+
+        return Errand.create(row, user);
     }
 }

@@ -1,9 +1,7 @@
 import { v4 as createId } from 'uuid';
-import { Errand } from './errand.models';
-
+import { UserEntity } from '../database/entities/user.entity';
 export class User {
     private _id: string;
-    private _errand: Errand[];
 
     constructor(
         private _name: string,
@@ -11,7 +9,6 @@ export class User {
         private _password: string
     ) {
         this._id = createId();
-        this._errand = [];
     }
 
     public get id() {
@@ -28,9 +25,6 @@ export class User {
     public get password() {
         return this._password;
     }
-    public get errand() {
-        return this._errand;
-    }
 
     public set name(name: string) {
         this._name = name;
@@ -42,5 +36,11 @@ export class User {
             name: this._name,
             email: this._email,
         };
+    }
+    public static create(row: UserEntity) {
+        const user = new User(row.name, row.email, row.password);
+        user._id = row.id;
+
+        return user;
     }
 }

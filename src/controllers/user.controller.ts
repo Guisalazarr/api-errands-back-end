@@ -4,9 +4,9 @@ import { UserRepository } from '../repositories/user.repository';
 import { User } from '../models/user.models';
 
 export class UserController {
-    public list(req: Request, res: Response) {
+    public async list(req: Request, res: Response) {
         try {
-            const users = new UserRepository().list();
+            const users = await new UserRepository().list();
 
             return ApiResponse.success(
                 res,
@@ -18,11 +18,11 @@ export class UserController {
         }
     }
 
-    public get(req: Request, res: Response) {
+    public async get(req: Request, res: Response) {
         try {
             const { id } = req.params;
 
-            const user = new UserRepository().get(id);
+            const user = await new UserRepository().get(id);
 
             if (!user) {
                 return ApiResponse.notFound(res, 'User');
@@ -38,12 +38,15 @@ export class UserController {
         }
     }
 
-    public create(req: Request, res: Response) {
+    public async create(req: Request, res: Response) {
         try {
             const { name, email, password } = req.body;
-            const validateUserExist = new UserRepository().validateAlreadyExist(
+
+            const repository = new UserRepository();
+            const validateUserExist = await repository.validateAlreadyExist(
                 email
             );
+
             if (validateUserExist) {
                 return ApiResponse.badRequest(
                     res,
@@ -52,8 +55,7 @@ export class UserController {
             }
 
             const user = new User(name, email, password);
-
-            new UserRepository().create(user);
+            await repository.create(user);
 
             return ApiResponse.success(
                 res,
@@ -65,16 +67,12 @@ export class UserController {
         }
     }
 
-    public login(req: Request, res: Response) {
+    public async login(req: Request, res: Response) {
         const { email, password } = req.body;
 
-        const user = new UserRepository().getByEmail(email);
+        const user = await new UserRepository().getLogin(email, password);
 
         if (!user) {
-            return ApiResponse.invalidCredentials(res);
-        }
-
-        if (user.password !== password) {
             return ApiResponse.invalidCredentials(res);
         }
 

@@ -5,19 +5,13 @@ import { ApiResponse } from '../util/http-response.adapter';
 import { Request, Response } from 'express';
 
 export class ErrandController {
-    public list(req: Request, res: Response) {
+    public async list(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const { title, status } = req.query;
 
-            const user = new UserRepository().get(id);
-
-            if (!user) {
-                return ApiResponse.notFound(res, 'User');
-            }
-
-            const errands = new ErrandRepository().list({
-                user: user,
+            const errands = await new ErrandRepository().list({
+                userId: id,
                 title: title?.toString(),
                 status: status as ErrandStatus,
             });
@@ -32,7 +26,7 @@ export class ErrandController {
         }
     }
 
-    public get(req: Request, res: Response) {
+    public async get(req: Request, res: Response) {
         try {
             const { id, errandId } = req.params;
 
@@ -42,7 +36,7 @@ export class ErrandController {
                 return ApiResponse.notFound(res, 'User');
             }
 
-            const errand = new ErrandRepository().get(user, errandId);
+            const errand = await new ErrandRepository().get(errandId);
             if (!errand) {
                 return ApiResponse.notFound(res, 'Errand');
             }
@@ -57,17 +51,18 @@ export class ErrandController {
         }
     }
 
-    public create(req: Request, res: Response) {
+    public async create(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const { title, description } = req.body;
 
-            const user = new UserRepository().get(id);
+            const user = await new UserRepository().get(id);
+
             if (!user) {
                 return ApiResponse.notFound(res, 'User');
             }
-            const errand = new Errand(title, description);
-            new ErrandRepository().create(user, errand);
+            const errand = new Errand(title, description, user);
+            await new ErrandRepository().create(errand);
 
             return ApiResponse.success(
                 res,
@@ -79,23 +74,23 @@ export class ErrandController {
         }
     }
 
-    public delete(req: Request, res: Response) {
+    public async delete(req: Request, res: Response) {
         try {
             const { id, errandId } = req.params;
 
-            const user = new UserRepository().get(id);
+            const user = await new UserRepository().get(id);
             if (!user) {
                 return ApiResponse.notFound(res, 'User');
             }
 
-            const errandRepository = new ErrandRepository();
-            const errand = errandRepository.delete(user, errandId);
+            const repository = new ErrandRepository();
+            const deleteErrand = await repository.delete(errandId);
 
-            if (!errand) {
-                return ApiResponse.notFound(res, 'user');
+            if (deleteErrand == 0) {
+                return ApiResponse.notFound(res, 'errand');
             }
-            const errands = errandRepository.list({
-                user,
+            const errands = await repository.list({
+                userId: user.id,
                 status: ErrandStatus.unarchived,
             });
 
@@ -109,35 +104,37 @@ export class ErrandController {
         }
     }
 
-    public update(req: Request, res: Response) {
+    public async update(req: Request, res: Response) {
         try {
             const { id, errandId } = req.params;
             const { title, description, status } = req.body;
 
-            const user = new UserRepository().get(id);
+            const user = await new UserRepository().get(id);
 
             if (!user) {
                 return ApiResponse.notFound(res, 'User');
             }
-            const errand = new ErrandRepository().get(user, errandId);
+
+            const repository = new ErrandRepository();
+            const errand = await repository.get(errandId);
 
             if (!errand) {
                 return ApiResponse.notFound(res, 'Errand');
             }
-
             if (title) {
                 errand.title = title;
             }
             if (description) {
                 errand.description = description;
             }
-
             if (status) {
                 errand.status = status;
             }
 
-            const errands = new ErrandRepository().list({
-                user,
+            await repository.update(errand);
+
+            const errands = await repository.list({
+                userId: user.id,
                 status: ErrandStatus.unarchived,
             });
 
