@@ -1,7 +1,7 @@
-import { Errand, ErrandStatus } from '../models/errand.models';
+import { Errand, ErrandStatus } from '../../../models/errand.models';
 import { ErrandRepository } from '../repositories/errand.repository';
-import { UserRepository } from '../repositories/user.repository';
-import { ApiResponse } from '../util/http-response.adapter';
+import { UserRepository } from '../../user/repositories/user.repository';
+import { ApiResponse } from '../../../shared/util/http-response.adapter';
 import { Request, Response } from 'express';
 
 export class ErrandController {

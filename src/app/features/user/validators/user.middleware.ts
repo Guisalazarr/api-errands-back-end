@@ -1,5 +1,5 @@
 import { Request, NextFunction, Response } from 'express';
-import { ApiResponse } from '../util/http-response.adapter';
+import { ApiResponse } from '../../../shared/util/http-response.adapter';
 
 export class UserMiddleware {
     public static validateCreateFields(

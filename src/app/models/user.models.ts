@@ -1,5 +1,5 @@
 import { v4 as createId } from 'uuid';
-import { UserEntity } from '../database/entities/user.entity';
+import { UserEntity } from '../shared/database/entities/user.entity';
 export class User {
     private _id: string;
 

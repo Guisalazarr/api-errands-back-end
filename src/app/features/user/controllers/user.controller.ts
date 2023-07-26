@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { ApiResponse } from '../util/http-response.adapter';
+import { ApiResponse } from '../../../shared/util/http-response.adapter';
 import { UserRepository } from '../repositories/user.repository';
-import { User } from '../models/user.models';
+import { User } from '../../../models/user.models';
 
 export class UserController {
     public async list(req: Request, res: Response) {

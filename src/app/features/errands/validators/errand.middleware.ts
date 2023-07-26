@@ -1,6 +1,6 @@
 import { Request, NextFunction, Response } from 'express';
-import { ApiResponse } from '../util/http-response.adapter';
-import { ErrandStatus } from '../models/errand.models';
+import { ApiResponse } from '../../../shared/util/http-response.adapter';
+import { ErrandStatus } from '../../../models/errand.models';
 
 export class ErrandMiddleware {
     public static validateCreateFields(

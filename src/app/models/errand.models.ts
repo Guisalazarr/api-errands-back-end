@@ -1,6 +1,6 @@
 import { v4 as createId } from 'uuid';
 import { User } from './user.models';
-import { ErrandEntity } from '../database/entities/errand.entity';
+import { ErrandEntity } from '../shared/database/entities/errand.entity';
 
 export enum ErrandStatus {
     unarchived = 'U',

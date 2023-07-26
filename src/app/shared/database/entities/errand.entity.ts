@@ -7,7 +7,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { ErrandStatus } from '../../models/errand.models';
+import { ErrandStatus } from '../../../models/errand.models';
 import { UserEntity } from './user.entity';
 
 @Entity('errand')
