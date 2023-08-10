@@ -1,7 +1,8 @@
 import { Request, NextFunction, Response } from 'express';
 import { ApiResponse } from '../../../shared/util/http-response.adapter';
+import { JwtService } from '../../../shared/service/jwt.service';
 
-export class UserMiddleware {
+export class UserValidator {
     public static validateCreateFields(
         req: Request,
         res: Response,

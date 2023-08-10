@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/user.controller';
-import { UserMiddleware } from '../validators/user.middleware';
 import { errandRoutes } from '../../errands/routes/errand.routes';
+import { UserValidator } from '../validators/user.validator';
 
 export const appRoutes = () => {
     const app = Router();
@@ -10,12 +10,12 @@ export const appRoutes = () => {
     app.get('/:id', new UserController().get);
     app.post(
         '/',
-        [UserMiddleware.validateCreateFields],
+        [UserValidator.validateCreateFields],
         new UserController().create
     );
     app.post(
         '/login',
-        [UserMiddleware.validateFieldsLogin],
+        [UserValidator.validateFieldsLogin],
         new UserController().login
     );
     app.use('/:id/errand', errandRoutes());
