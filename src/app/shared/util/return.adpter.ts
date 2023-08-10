@@ -17,6 +17,14 @@ export class Return {
         };
     }
 
+    public static badRequest(message: string): Result {
+        return {
+            ok: false,
+            message,
+            code: 400,
+        };
+    }
+
     public static success(message: string, data: any): Result {
         return {
             ok: true,

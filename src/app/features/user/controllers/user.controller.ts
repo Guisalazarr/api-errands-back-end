@@ -3,17 +3,15 @@ import { ApiResponse } from '../../../shared/util/http-response.adapter';
 import { UserRepository } from '../repositories/user.repository';
 import { User } from '../../../models/user.models';
 import { GetUserUsecase } from '../usecases/get-user.usecase';
+import { ListUserUsecase } from '../usecases/list-user.usecase';
+import { CreateUserUsecase } from '../usecases/create-user.usecase';
 
 export class UserController {
     public async list(req: Request, res: Response) {
         try {
-            const users = await new UserRepository().list();
+            const result = await new ListUserUsecase().execute();
 
-            return ApiResponse.success(
-                res,
-                'Users were successfully listed',
-                users.map((user) => user.toJson())
-            );
+            return res.status(result.code).send(result);
         } catch (error: any) {
             return ApiResponse.serverError(res, error);
         }
@@ -35,26 +33,9 @@ export class UserController {
         try {
             const { name, email, password } = req.body;
 
-            const repository = new UserRepository();
-            const validateUserExist = await repository.validateAlreadyExist(
-                email
-            );
+            const result = await new CreateUserUsecase().execute(req.body);
 
-            if (validateUserExist) {
-                return ApiResponse.badRequest(
-                    res,
-                    `User already exists with email: ${email}`
-                );
-            }
-
-            const user = new User(name, email, password);
-            await repository.create(user);
-
-            return ApiResponse.success(
-                res,
-                'User was successfully created',
-                user.toJson()
-            );
+            return res.status(result.code).send(result);
         } catch (error: any) {
             return ApiResponse.serverError(res, error);
         }

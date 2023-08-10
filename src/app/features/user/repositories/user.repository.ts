@@ -47,7 +47,7 @@ export class UserRepository {
         await this.repository.save(result);
     }
 
-    public async validateAlreadyExist(email: string) {
+    public async getByEmail(email: string) {
         const result = await this.repository.findOneBy({
             email,
         });
