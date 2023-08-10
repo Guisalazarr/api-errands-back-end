@@ -23,19 +23,6 @@ export class UserRepository {
         return UserRepository.mapRowToModel(result);
     }
 
-    public async getLogin(email: string, password: string) {
-        const result = await this.repository.findOneBy({
-            email,
-            password,
-        });
-
-        if (!result) {
-            return undefined;
-        }
-
-        return UserRepository.mapRowToModel(result);
-    }
-
     public async create(user: User) {
         const result = this.repository.create({
             id: user.id,

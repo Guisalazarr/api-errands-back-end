@@ -1,7 +1,7 @@
 import { Result } from '../contracts/result.contract';
 
 export class Return {
-    public static invalidCredencial(): Result {
+    public static invalidCredencials(): Result {
         return {
             ok: false,
             message: 'Unauthorized access',
