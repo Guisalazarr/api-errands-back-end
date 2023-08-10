@@ -5,6 +5,7 @@ import { User } from '../../../models/user.models';
 import { GetUserUsecase } from '../usecases/get-user.usecase';
 import { ListUserUsecase } from '../usecases/list-user.usecase';
 import { CreateUserUsecase } from '../usecases/create-user.usecase';
+import { LoginUsecase } from '../usecases/login-user.usecase';
 
 export class UserController {
     public async list(req: Request, res: Response) {
@@ -44,15 +45,8 @@ export class UserController {
     public async login(req: Request, res: Response) {
         const { email, password } = req.body;
 
-        const user = await new UserRepository().getLogin(email, password);
+        const result = await new LoginUsecase().execute(req.body);
 
-        if (!user) {
-            return ApiResponse.invalidCredentials(res);
-        }
-
-        return ApiResponse.success(res, 'Login successfully done', {
-            id: user.id,
-            name: user.name,
-        });
+        return res.status(result.code).send(result);
     }
 }
