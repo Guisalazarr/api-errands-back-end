@@ -22,7 +22,7 @@ const config = new DataSource({
         rejectUnauthorized: false,
     },
     synchronize: false,
-    schema: 'transactions',
+    schema: 'errands',
     entities: entities,
     migrations: migrations,
 });

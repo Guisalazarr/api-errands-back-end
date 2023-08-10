@@ -8,7 +8,6 @@ export const appRoutes = () => {
 
     app.get('/', new UserController().list);
     app.get('/:id', new UserController().get);
-
     app.post(
         '/',
         [UserMiddleware.validateCreateFields],
@@ -19,7 +18,6 @@ export const appRoutes = () => {
         [UserMiddleware.validateFieldsLogin],
         new UserController().login
     );
-
     app.use('/:id/errand', errandRoutes());
     return app;
 };

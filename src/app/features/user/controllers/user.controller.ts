@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ApiResponse } from '../../../shared/util/http-response.adapter';
 import { UserRepository } from '../repositories/user.repository';
 import { User } from '../../../models/user.models';
+import { GetUserUsecase } from '../usecases/get-user.usecase';
 
 export class UserController {
     public async list(req: Request, res: Response) {
@@ -22,17 +23,9 @@ export class UserController {
         try {
             const { id } = req.params;
 
-            const user = await new UserRepository().get(id);
+            const result = await new GetUserUsecase().execute(id);
 
-            if (!user) {
-                return ApiResponse.notFound(res, 'User');
-            }
-
-            return ApiResponse.success(
-                res,
-                'Users were successfully listed',
-                user.toJson()
-            );
+            return res.status(result.code).send(result);
         } catch (error: any) {
             return ApiResponse.serverError(res, error);
         }
