@@ -3,7 +3,7 @@ import { UserController } from '../controllers/user.controller';
 import { UserMiddleware } from '../validators/user.middleware';
 import { errandRoutes } from '../../errands/routes/errand.routes';
 
-export const userRoutes = () => {
+export const appRoutes = () => {
     const app = Router();
 
     app.get('/', new UserController().list);
