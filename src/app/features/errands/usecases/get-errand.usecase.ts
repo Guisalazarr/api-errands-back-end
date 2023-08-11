@@ -1,4 +1,3 @@
-import { ErrandStatus } from '../../../models/errand.models';
 import { Result } from '../../../shared/contracts/result.contract';
 import { CacheRepository } from '../../../shared/database/repositories/cache.repository';
 import { Return } from '../../../shared/util/return.adpter';
@@ -12,7 +11,7 @@ interface GetUserParams {
 
 export class GetErrandUseCase {
     public async execute(params: GetUserParams): Promise<Result> {
-        const user = new UserRepository().get(params.userId);
+        const user = await new UserRepository().get(params.userId);
         if (!user) {
             return Return.notFound('User');
         }
@@ -24,7 +23,7 @@ export class GetErrandUseCase {
 
         if (cachedErrand) {
             return Return.success(
-                'Errands succesfully obtained (cache)',
+                'Errand succesfully obtained (cache)',
                 cachedErrand
             );
         }

@@ -5,6 +5,9 @@ import { ApiResponse } from '../../../shared/util/http-response.adapter';
 import { Request, Response } from 'express';
 import { ListErrandsUseCase } from '../usecases/list-errands.usecase';
 import { GetErrandUseCase } from '../usecases/get-errand.usecase';
+import { CreateUserUsecase } from '../../user/usecases/create-user.usecase';
+import { CreateErrandUsecase } from '../usecases/create-errand.usecase';
+import { Return } from '../../../shared/util/return.adpter';
 
 export class ErrandController {
     public async list(req: Request, res: Response) {
@@ -44,19 +47,13 @@ export class ErrandController {
             const { id } = req.params;
             const { title, description } = req.body;
 
-            const user = await new UserRepository().get(id);
+            const result = await new CreateErrandUsecase().execute({
+                userId: id,
+                title,
+                description,
+            });
 
-            if (!user) {
-                return ApiResponse.notFound(res, 'User');
-            }
-            const errand = new Errand(title, description, user);
-            await new ErrandRepository().create(errand);
-
-            return ApiResponse.success(
-                res,
-                'Errand successfully created',
-                errand.toJson()
-            );
+            return res.status(result.code).send(result);
         } catch (error: any) {
             return ApiResponse.serverError(res, error);
         }
