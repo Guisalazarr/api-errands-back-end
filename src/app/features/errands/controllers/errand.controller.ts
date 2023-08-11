@@ -3,6 +3,7 @@ import { ErrandRepository } from '../repositories/errand.repository';
 import { UserRepository } from '../../user/repositories/user.repository';
 import { ApiResponse } from '../../../shared/util/http-response.adapter';
 import { Request, Response } from 'express';
+import { ListErrandsUseCase } from '../usecases/list-errands.usecase';
 
 export class ErrandController {
     public async list(req: Request, res: Response) {
@@ -10,17 +11,13 @@ export class ErrandController {
             const { id } = req.params;
             const { title, status } = req.query;
 
-            const errands = await new ErrandRepository().list({
+            const result = await new ListErrandsUseCase().execute({
                 userId: id,
                 title: title?.toString(),
                 status: status as ErrandStatus,
             });
 
-            return ApiResponse.success(
-                res,
-                'Errand successfully listed',
-                errands.map((errand) => errand.toJson())
-            );
+            return res.status(result.code).send(result);
         } catch (error: any) {
             return ApiResponse.serverError(res, error);
         }
