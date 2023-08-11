@@ -1,14 +1,11 @@
-import { Errand, ErrandStatus } from '../../../models/errand.models';
-import { ErrandRepository } from '../repositories/errand.repository';
-import { UserRepository } from '../../user/repositories/user.repository';
+import { ErrandStatus } from '../../../models/errand.models';
 import { ApiResponse } from '../../../shared/util/http-response.adapter';
 import { Request, Response } from 'express';
 import { ListErrandsUseCase } from '../usecases/list-errands.usecase';
 import { GetErrandUseCase } from '../usecases/get-errand.usecase';
-import { CreateUserUsecase } from '../../user/usecases/create-user.usecase';
 import { CreateErrandUsecase } from '../usecases/create-errand.usecase';
-import { Return } from '../../../shared/util/return.adpter';
 import { DeleteErrandUsecase } from '../usecases/delete-errands.usecase';
+import { UpdateErrandsUseCase } from '../usecases/update-errand.usecase';
 
 export class ErrandController {
     public async list(req: Request, res: Response) {
@@ -80,40 +77,15 @@ export class ErrandController {
             const { id, errandId } = req.params;
             const { title, description, status } = req.body;
 
-            const user = await new UserRepository().get(id);
-
-            if (!user) {
-                return ApiResponse.notFound(res, 'User');
-            }
-
-            const repository = new ErrandRepository();
-            const errand = await repository.get(errandId);
-
-            if (!errand) {
-                return ApiResponse.notFound(res, 'Errand');
-            }
-            if (title) {
-                errand.title = title;
-            }
-            if (description) {
-                errand.description = description;
-            }
-            if (status) {
-                errand.status = status;
-            }
-
-            await repository.update(errand);
-
-            const errands = await repository.list({
-                userId: user.id,
-                status: ErrandStatus.unarchived,
+            const result = await new UpdateErrandsUseCase().execute({
+                userId: id,
+                errandId,
+                title,
+                description,
+                status,
             });
 
-            return ApiResponse.success(
-                res,
-                'Errand successfully edited',
-                errands.map((errand) => errand.toJson())
-            );
+            return res.status(result.code).send(result);
         } catch (error: any) {
             return ApiResponse.serverError(res, error);
         }

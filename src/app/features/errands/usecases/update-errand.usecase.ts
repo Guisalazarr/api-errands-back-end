@@ -5,37 +5,51 @@ import { Return } from '../../../shared/util/return.adpter';
 import { UserRepository } from '../../user/repositories/user.repository';
 import { ErrandRepository } from '../repositories/errand.repository';
 
-interface DeleteErrandsParams {
+export interface UpdateErrandsParams {
     userId: string;
     errandId: string;
+    title?: string;
+    description?: string;
+    status?: ErrandStatus;
 }
 
-export class DeleteErrandUsecase {
-    public async execute(params: DeleteErrandsParams): Promise<Result> {
+export class UpdateErrandsUseCase {
+    public async execute(params: UpdateErrandsParams): Promise<Result> {
         const user = await new UserRepository().get(params.userId);
+
         if (!user) {
             return Return.notFound('User');
         }
-
         const errandRepository = new ErrandRepository();
-        const errandDeleted = await errandRepository.delete(params.errandId);
+        const errand = await errandRepository.get(params.errandId);
 
-        if (errandDeleted == 0) {
+        if (!errand) {
             return Return.notFound('Errand');
         }
+
+        if (params.title) {
+            errand.title = params.title;
+        }
+        if (params.description) {
+            errand.description = params.description;
+        }
+        if (params.status) {
+            errand.status = params.status;
+        }
+
+        await errandRepository.update(errand);
 
         const cacheRepository = new CacheRepository();
         await cacheRepository.delete(`errands-${params.userId}`);
         await cacheRepository.delete(`errand-${params.errandId}`);
 
-        const result = await errandRepository.list({
+        const errands = await errandRepository.list({
             userId: user.id,
             status: ErrandStatus.unarchived,
         });
 
-        return Return.success(
-            'Errand successfully deleted',
-            result.map((errand) => errand.toJson())
-        );
+        const result = errands.map((errand) => errand.toJson());
+
+        return Return.success('Errand successfully Edited', result);
     }
 }
