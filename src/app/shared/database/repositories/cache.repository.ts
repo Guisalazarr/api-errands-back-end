@@ -1,10 +1,11 @@
 import { json } from 'stream/consumers';
 import { CacheDatabase } from '../../../../main/database/redis.connection';
+import { Errand } from '../../../models/errand.models';
 
 export class CacheRepository {
     private repository = CacheDatabase.connection;
 
-    public async get(key: string) {
+    public async get(key: string): Promise<Errand[] | null> {
         const result = await this.repository.get(key);
 
         if (!result) {

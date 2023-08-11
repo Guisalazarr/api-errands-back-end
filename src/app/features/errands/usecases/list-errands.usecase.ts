@@ -1,4 +1,5 @@
-import { ErrandStatus } from '../../../models/errand.models';
+import { title } from 'process';
+import { Errand, ErrandStatus } from '../../../models/errand.models';
 import { Result } from '../../../shared/contracts/result.contract';
 import { CacheRepository } from '../../../shared/database/repositories/cache.repository';
 import { Return } from '../../../shared/util/return.adpter';
@@ -18,10 +19,12 @@ export class ListErrandsUseCase {
         );
 
         if (cachedErrands) {
-            return Return.success(
-                'Errands succesfully listed (cache)',
-                cachedErrands
+            const result = cachedErrands?.filter(
+                (errand) =>
+                    (!params.title || errand.title === params.title) &&
+                    (!params.status || errand.status === params.status)
             );
+            return Return.success('Errands successfully listed(cache)', result);
         }
 
         const errands = await new ErrandRepository().list({
@@ -32,7 +35,9 @@ export class ListErrandsUseCase {
 
         const result = errands.map((errand) => errand.toJson());
 
-        await cacheRepository.set(`errands-${params.userId}`, result);
+        if (result.length && !params.title && !params.status) {
+            await cacheRepository.set(`errands-${params.userId}`, result);
+        }
 
         return Return.success('Errands successfully listed', result);
     }
