@@ -4,7 +4,7 @@ import { CacheRepository } from '../../../shared/database/repositories/cache.rep
 import { Return } from '../../../shared/util/return.adpter';
 import { ErrandRepository } from '../repositories/errand.repository';
 
-interface ListErrandsParams {
+export interface ListErrandsParams {
     userId: string;
     title?: string;
     status?: ErrandStatus;

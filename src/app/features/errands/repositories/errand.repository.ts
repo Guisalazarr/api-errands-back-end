@@ -2,12 +2,7 @@ import { ErrandEntity } from '../../../shared/database/entities/errand.entity';
 import { Errand, ErrandStatus } from '../../../models/errand.models';
 import { UserRepository } from '../../user/repositories/user.repository';
 import { Database } from '../../../../main/database/database.connection';
-
-interface ListErrandsParams {
-    userId: string;
-    title?: string;
-    status?: ErrandStatus;
-}
+import { ListErrandsParams } from '../usecases/list-errands.usecase';
 
 export class ErrandRepository {
     private repository = Database.connection.getRepository(ErrandEntity);
