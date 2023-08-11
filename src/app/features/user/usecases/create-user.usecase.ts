@@ -21,6 +21,6 @@ export class CreateUserUsecase {
         const user = new User(params.name, params.email, params.password);
         repository.create(user);
 
-        return Return.success('User successfully obtained', user.toJson());
+        return Return.success('User successfully created', user.toJson());
     }
 }

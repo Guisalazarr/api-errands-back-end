@@ -1,6 +1,5 @@
 import { Request, NextFunction, Response } from 'express';
 import { ApiResponse } from '../../../shared/util/http-response.adapter';
-import { JwtService } from '../../../shared/service/jwt.service';
 
 export class UserValidator {
     public static validateCreateFields(
@@ -9,7 +8,7 @@ export class UserValidator {
         next: NextFunction
     ) {
         try {
-            const { name, email, password, repeatPassword } = req.body;
+            const { name, email, password } = req.body;
 
             const validEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
@@ -22,15 +21,6 @@ export class UserValidator {
             if (!password) {
                 return ApiResponse.notProvided(res, 'Password');
             }
-            if (!repeatPassword) {
-                return ApiResponse.notProvided(res, 'Repeat Password');
-            }
-            if (password !== repeatPassword) {
-                return ApiResponse.badRequest(
-                    res,
-                    'The passwords were not match'
-                );
-            }
 
             if (!email.match(validEmail)) {
                 return ApiResponse.invalidField(res, 'Email');
@@ -41,24 +31,41 @@ export class UserValidator {
             return ApiResponse.serverError(res, error);
         }
     }
-    public static validateFieldsLogin(
+
+    public static validatePassword(
         req: Request,
         res: Response,
         next: NextFunction
     ) {
         try {
-            const { email, password } = req.body;
-            const validEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+            const { password, repeatPassword } = req.body;
 
-            if (!email) {
-                return ApiResponse.notProvided(res, 'Email');
-            }
             if (!password) {
                 return ApiResponse.notProvided(res, 'Password');
             }
 
-            if (!email.match(validEmail)) {
-                return ApiResponse.invalidField(res, 'Email');
+            if (password.length < 4) {
+                return ApiResponse.badRequest(
+                    res,
+                    'Password must be at least 4 characters'
+                );
+            }
+
+            if (password.length > 12) {
+                return ApiResponse.badRequest(
+                    res,
+                    'Password must be at most minus 12 characters'
+                );
+            }
+
+            if (!repeatPassword) {
+                return ApiResponse.notProvided(res, 'Repeat Password');
+            }
+            if (password !== repeatPassword) {
+                return ApiResponse.badRequest(
+                    res,
+                    'The passwords were not match'
+                );
             }
 
             next();

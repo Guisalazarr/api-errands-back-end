@@ -15,14 +15,4 @@ export class JwtService {
             return false;
         }
     }
-
-    public decodeToken(token: string): any {
-        const result = jwt.decode(token);
-
-        if (!result) {
-            return null;
-        }
-
-        return result;
-    }
 }
