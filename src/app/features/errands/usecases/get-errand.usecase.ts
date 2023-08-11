@@ -36,7 +36,7 @@ export class GetErrandUseCase {
 
         const result = errand.toJson();
 
-        await cacheRepository.set(`errands-${params.errandId}`, result);
+        await cacheRepository.set(`errand-${params.errandId}`, result);
 
         return Return.success('Errands successfully listed', result);
     }
