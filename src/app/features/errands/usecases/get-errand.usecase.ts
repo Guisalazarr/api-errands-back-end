@@ -10,14 +10,19 @@ interface GetUserParams {
 }
 
 export class GetErrandUseCase {
+    constructor(
+        private userRepository: UserRepository,
+        private errandRepository: ErrandRepository,
+        private cacheRepository: CacheRepository
+    ) {}
+
     public async execute(params: GetUserParams): Promise<Result> {
-        const user = await new UserRepository().get(params.userId);
+        const user = await this.userRepository.get(params.userId);
         if (!user) {
             return Return.notFound('User');
         }
 
-        const cacheRepository = new CacheRepository();
-        const cachedErrand = await cacheRepository.get(
+        const cachedErrand = await this.cacheRepository.get(
             `errands-${params.errandId}`
         );
 
@@ -28,7 +33,7 @@ export class GetErrandUseCase {
             );
         }
 
-        const errand = await new ErrandRepository().get(params.errandId);
+        const errand = await this.errandRepository.get(params.errandId);
 
         if (!errand) {
             return Return.notFound('Errand');
@@ -36,7 +41,7 @@ export class GetErrandUseCase {
 
         const result = errand.toJson();
 
-        await cacheRepository.set(`errand-${params.errandId}`, result);
+        await this.cacheRepository.set(`errand-${params.errandId}`, result);
 
         return Return.success('Errands successfully listed', result);
     }

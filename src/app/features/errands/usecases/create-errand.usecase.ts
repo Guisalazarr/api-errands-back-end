@@ -13,16 +13,22 @@ interface CreateErrandsParams {
 }
 
 export class CreateErrandUsecase {
+    constructor(
+        private userRepository: UserRepository,
+        private errandRepository: ErrandRepository,
+        private cacheRepository: CacheRepository
+    ) {}
+
     public async execute(params: CreateErrandsParams): Promise<Result> {
-        const user = await new UserRepository().get(params.userId);
+        const user = await this.userRepository.get(params.userId);
         if (!user) {
             return Return.notFound('User');
         }
 
         const errand = new Errand(params.title, params.description, user);
-        await new ErrandRepository().create(errand);
+        await this.errandRepository.create(errand);
 
-        await new CacheRepository().delete(`errands-${params.userId}`);
+        await this.cacheRepository.delete(`errands-${params.userId}`);
 
         return Return.success('Errand successfully created', errand.toJson());
     }

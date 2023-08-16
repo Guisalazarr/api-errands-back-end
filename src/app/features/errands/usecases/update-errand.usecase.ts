@@ -14,14 +14,20 @@ export interface UpdateErrandsParams {
 }
 
 export class UpdateErrandsUseCase {
+    constructor(
+        private userRepository: UserRepository,
+        private errandRepository: ErrandRepository,
+        private cacheRepository: CacheRepository
+    ) {}
+
     public async execute(params: UpdateErrandsParams): Promise<Result> {
-        const user = await new UserRepository().get(params.userId);
+        const user = await this.userRepository.get(params.userId);
 
         if (!user) {
             return Return.notFound('User');
         }
-        const errandRepository = new ErrandRepository();
-        const errand = await errandRepository.get(params.errandId);
+
+        const errand = await this.errandRepository.get(params.errandId);
 
         if (!errand) {
             return Return.notFound('Errand');
@@ -37,13 +43,12 @@ export class UpdateErrandsUseCase {
             errand.status = params.status;
         }
 
-        await errandRepository.update(errand);
+        await this.errandRepository.update(errand);
 
-        const cacheRepository = new CacheRepository();
-        await cacheRepository.delete(`errands-${params.userId}`);
-        await cacheRepository.delete(`errand-${params.errandId}`);
+        await this.cacheRepository.delete(`errands-${params.userId}`);
+        await this.cacheRepository.delete(`errand-${params.errandId}`);
 
-        const errands = await errandRepository.list({
+        const errands = await this.errandRepository.list({
             userId: user.id,
             status: ErrandStatus.unarchived,
         });
