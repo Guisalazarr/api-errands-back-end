@@ -10,16 +10,19 @@ interface CreateUserParams {
 }
 
 export class CreateUserUsecase {
+    constructor(private userRepository: UserRepository) {}
+
     public async execute(params: CreateUserParams): Promise<Result> {
-        const repository = new UserRepository();
-        const ValidIsRegistered = await repository.getByEmail(params.email);
+        const ValidIsRegistered = await this.userRepository.getByEmail(
+            params.email
+        );
 
         if (ValidIsRegistered) {
             return Return.badRequest('Email already registered');
         }
 
         const user = new User(params.name, params.email, params.password);
-        repository.create(user);
+        this.userRepository.create(user);
 
         return Return.success('User successfully created', user.toJson());
     }

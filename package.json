@@ -13,7 +13,11 @@
         "typeorm:create": "typeorm migration:create",
         "typeorm:run": "npm run typeorm migration:run -- -d ./src/database/config/database.config.ts",
         "typeorm:revert": "npm run typeorm migration:revert -- -d ./src/database/config/database.config.ts",
-        "typeorm:generate": "npm run typeorm migration:generate UserEntity -- -d ./src/database/config/database.config.ts"
+        "typeorm:generate": "npm run typeorm migration:generate UserEntity -- -d ./src/database/config/database.config.ts",
+        "test": "jest -silent -noStackTrace -runInBand",
+        "test:verbose": "jest -verbose -runInBand -detectOpenHandles",
+        "test:coverage": "jest -runInBand -coverage",
+        "test:watch": "jest -silent -noStackTrace -runInBand -watchAll"
     },
     "prettier": {
         "trailingComma": "es5",
@@ -27,10 +31,12 @@
     "devDependencies": {
         "@types/cors": "^2.8.13",
         "@types/express": "^4.17.17",
+        "@types/jest": "^29.5.3",
         "@types/jsonwebtoken": "^9.0.2",
         "@types/node": "^20.4.9",
         "@types/pg": "^8.10.2",
         "@types/uuid": "^9.0.1",
+        "ts-jest": "^29.1.1",
         "ts-node-dev": "^2.0.0",
         "typescript": "^5.0.4"
     },
@@ -40,6 +46,7 @@
         "dotenv": "^16.1.4",
         "express": "^4.18.2",
         "ioredis": "^5.3.2",
+        "jest": "^29.6.2",
         "jsonwebtoken": "^9.0.1",
         "pg": "^8.11.1",
         "reflect-metadata": "^0.1.13",

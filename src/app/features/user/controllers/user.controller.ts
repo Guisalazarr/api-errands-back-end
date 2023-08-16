@@ -8,9 +8,16 @@ import { CreateUserUsecase } from '../usecases/create-user.usecase';
 import { LoginUsecase } from '../usecases/login-user.usecase';
 
 export class UserController {
+    constructor(
+        private createUsecase: CreateUserUsecase,
+        private listUsecase: ListUserUsecase,
+        private getUsecase: GetUserUsecase,
+        private loginUsecase: LoginUsecase
+    ) {}
+
     public async list(req: Request, res: Response) {
         try {
-            const result = await new ListUserUsecase().execute();
+            const result = await this.listUsecase.execute();
 
             return res.status(result.code).send(result);
         } catch (error: any) {
@@ -22,7 +29,7 @@ export class UserController {
         try {
             const { id } = req.params;
 
-            const result = await new GetUserUsecase().execute(id);
+            const result = await this.getUsecase.execute(id);
 
             return res.status(result.code).send(result);
         } catch (error: any) {
@@ -34,7 +41,7 @@ export class UserController {
         try {
             const { name, email, password } = req.body;
 
-            const result = await new CreateUserUsecase().execute(req.body);
+            const result = await this.createUsecase.execute(req.body);
 
             return res.status(result.code).send(result);
         } catch (error: any) {
@@ -45,7 +52,7 @@ export class UserController {
     public async login(req: Request, res: Response) {
         const { email, password } = req.body;
 
-        const result = await new LoginUsecase().execute(req.body);
+        const result = await this.loginUsecase.execute(req.body);
 
         return res.status(result.code).send(result);
     }

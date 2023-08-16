@@ -11,7 +11,7 @@ export const createApp = () => {
     app.use(cors());
 
     app.get('/', (req: Request, res: Response) =>
-        res.status(200).json({ ok: true, message: 'API JOBS' })
+        res.status(200).json({ ok: true, message: 'API ERRANDS' })
     );
 
     app.use('/user', appRoutes());

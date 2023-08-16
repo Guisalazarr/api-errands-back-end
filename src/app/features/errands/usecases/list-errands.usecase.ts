@@ -1,5 +1,4 @@
-import { title } from 'process';
-import { Errand, ErrandStatus } from '../../../models/errand.models';
+import { ErrandStatus } from '../../../models/errand.models';
 import { Result } from '../../../shared/contracts/result.contract';
 import { CacheRepository } from '../../../shared/database/repositories/cache.repository';
 import { Return } from '../../../shared/util/return.adpter';

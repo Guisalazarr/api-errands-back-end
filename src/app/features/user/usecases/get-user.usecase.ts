@@ -3,9 +3,10 @@ import { Return } from '../../../shared/util/return.adpter';
 import { Result } from '../../../shared/contracts/result.contract';
 
 export class GetUserUsecase {
+    constructor(private userRepository: UserRepository) {}
+
     public async execute(id: string): Promise<Result> {
-        const respository = new UserRepository();
-        const result = await respository.get(id);
+        const result = await this.userRepository.get(id);
 
         if (!result) {
             return Return.notFound('User');

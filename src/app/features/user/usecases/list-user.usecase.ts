@@ -3,9 +3,9 @@ import { UserRepository } from '../repositories/user.repository';
 import { Result } from '../../../shared/contracts/result.contract';
 
 export class ListUserUsecase {
+    constructor(private userRepository: UserRepository) {}
     public async execute(): Promise<Result> {
-        const repository = new UserRepository();
-        const result = await repository.list();
+        const result = await this.userRepository.list();
 
         return Return.success(
             'User successfully obtained',

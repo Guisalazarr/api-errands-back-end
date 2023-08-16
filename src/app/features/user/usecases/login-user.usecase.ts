@@ -9,6 +9,7 @@ interface LoginParams {
 }
 
 export class LoginUsecase {
+    constructor(private userRepository: UserRepository) {}
     public async execute(params: LoginParams): Promise<Result> {
         const user = await new UserRepository().getByEmail(params.email);
         if (!user) {
