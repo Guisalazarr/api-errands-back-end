@@ -23,7 +23,7 @@ export class GetErrandUseCase {
         }
 
         const cachedErrand = await this.cacheRepository.get(
-            `errands-${params.errandId}`
+            `errand-${params.errandId}`
         );
 
         if (cachedErrand) {
