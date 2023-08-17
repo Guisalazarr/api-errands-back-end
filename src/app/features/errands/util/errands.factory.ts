@@ -25,7 +25,7 @@ export class ErrandController {
         return new CacheRepository();
     }
 
-    public get createUsecase() {
+    public get createErrand() {
         const createUsecase = new CreateErrandUsecase(
             this.userRepository,
             this.errandRepository,
@@ -34,7 +34,7 @@ export class ErrandController {
         return new CreateErrandController(createUsecase);
     }
 
-    public get listUsecase() {
+    public get listErrand() {
         const listUsecase = new ListErrandsUseCase(
             this.userRepository,
             this.errandRepository,
@@ -43,7 +43,7 @@ export class ErrandController {
         return new ListErrandController(listUsecase);
     }
 
-    public get getUsecase() {
+    public get getErrand() {
         const getUsecase = new GetErrandUseCase(
             this.userRepository,
             this.errandRepository,
@@ -52,7 +52,7 @@ export class ErrandController {
         return new GetErrandController(getUsecase);
     }
 
-    public get deleteUsecase() {
+    public get deleteErrand() {
         const deleteUsecase = new DeleteErrandUsecase(
             this.userRepository,
             this.errandRepository,
@@ -61,7 +61,7 @@ export class ErrandController {
         return new DeleteErrandController(deleteUsecase);
     }
 
-    public get updateUsecase() {
+    public get updateErrand() {
         const updateUsecase = new UpdateErrandsUseCase(
             this.userRepository,
             this.errandRepository,

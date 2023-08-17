@@ -12,28 +12,28 @@ export const errandRoutes = () => {
     const controller = new ErrandController();
 
     app.get('/', logged, (req: Request, res: Response) =>
-        controller.listUsecase.list(req, res)
+        controller.listErrand.list(req, res)
     );
     app.get('/:errandId', logged, (req: Request, res: Response) =>
-        controller.getUsecase.get(req, res)
+        controller.getErrand.get(req, res)
     );
     app.post(
         '/',
         logged,
         [ErrandValidator.validateCreateFields],
         (req: Request, res: Response) =>
-            controller.createUsecase.create(req, res)
+            controller.createErrand.create(req, res)
     );
     app.put(
         '/:errandId',
         logged,
         [ErrandValidator.validateStatusErrand],
         (req: Request, res: Response) =>
-            controller.updateUsecase.update(req, res)
+            controller.updateErrand.update(req, res)
     );
 
     app.delete('/:errandId', logged, (req: Request, res: Response) =>
-        controller.deleteUsecase.delete(req, res)
+        controller.deleteErrand.delete(req, res)
     );
 
     return app;

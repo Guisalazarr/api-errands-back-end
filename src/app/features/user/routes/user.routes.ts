@@ -10,21 +10,20 @@ export const appRoutes = () => {
     const controller = new UserController();
 
     app.get('/', (req: Request, res: Response) =>
-        controller.listUsecase.list(req, res)
+        controller.listUser.list(req, res)
     );
     app.get('/:id', (req: Request, res: Response) =>
-        controller.getUsecase.get(req, res)
+        controller.getUser.get(req, res)
     );
     app.post(
         '/',
         [UserValidator.validateCreateFields, UserValidator.validatePassword],
-        (req: Request, res: Response) =>
-            controller.createUsecase.create(req, res)
+        (req: Request, res: Response) => controller.createUser.create(req, res)
     );
     app.post(
         '/login',
         [LoginValidator.validateFieldsLogin],
-        (req: Request, res: Response) => controller.loginUsecase.login(req, res)
+        (req: Request, res: Response) => controller.loginUser.login(req, res)
     );
     app.use('/:id/errand', errandRoutes());
     return app;

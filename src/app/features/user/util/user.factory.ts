@@ -13,22 +13,22 @@ export class UserController {
         return new UserRepository();
     }
 
-    public get createUsecase() {
+    public get createUser() {
         const createUsecase = new CreateUserUsecase(this.userReposigleton);
         return new CreateUserController(createUsecase);
     }
 
-    public get listUsecase() {
+    public get listUser() {
         const listUsecase = new ListUserUsecase(this.userReposigleton);
         return new ListUserController(listUsecase);
     }
 
-    public get getUsecase() {
+    public get getUser() {
         const getUsecase = new GetUserUsecase(this.userReposigleton);
         return new GetUserController(getUsecase);
     }
 
-    public get loginUsecase() {
+    public get loginUser() {
         const loginUsecase = new LoginUsecase(this.userReposigleton);
         return new LoginUserController(loginUsecase);
     }
