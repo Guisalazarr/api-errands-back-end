@@ -1,22 +1,35 @@
-import { UserController } from '../controllers/user.controller';
+import { CreateUserController } from '../controllers/create-user.controller';
+import { GetUserController } from '../controllers/get-user.controller';
+import { ListUserController } from '../controllers/list-user.controller';
+import { LoginUserController } from '../controllers/login-user.controller';
 import { UserRepository } from '../repositories/user.repository';
 import { CreateUserUsecase } from '../usecases/create-user.usecase';
 import { GetUserUsecase } from '../usecases/get-user.usecase';
 import { ListUserUsecase } from '../usecases/list-user.usecase';
 import { LoginUsecase } from '../usecases/login-user.usecase';
 
-export function createUserController() {
-    const userRepoSigleton = new UserRepository();
+export class UserController {
+    private get userReposigleton() {
+        return new UserRepository();
+    }
 
-    const createUsecase = new CreateUserUsecase(userRepoSigleton);
-    const listUsecase = new ListUserUsecase(userRepoSigleton);
-    const getUsecase = new GetUserUsecase(userRepoSigleton);
-    const loginUsecase = new LoginUsecase(userRepoSigleton);
+    public get createUsecase() {
+        const createUsecase = new CreateUserUsecase(this.userReposigleton);
+        return new CreateUserController(createUsecase);
+    }
 
-    return new UserController(
-        createUsecase,
-        listUsecase,
-        getUsecase,
-        loginUsecase
-    );
+    public get listUsecase() {
+        const listUsecase = new ListUserUsecase(this.userReposigleton);
+        return new ListUserController(listUsecase);
+    }
+
+    public get getUsecase() {
+        const getUsecase = new GetUserUsecase(this.userReposigleton);
+        return new GetUserController(getUsecase);
+    }
+
+    public get loginUsecase() {
+        const loginUsecase = new LoginUsecase(this.userReposigleton);
+        return new LoginUserController(loginUsecase);
+    }
 }
