@@ -1,6 +1,10 @@
 import { CacheRepository } from '../../../shared/database/repositories/cache.repository';
 import { UserRepository } from '../../user/repositories/user.repository';
-import { ErrandController } from '../controllers/errand.controller';
+import { CreateErrandController } from '../controllers/create-errand.controller';
+import { DeleteErrandController } from '../controllers/delete-errand.controller';
+import { GetErrandController } from '../controllers/get-errand.controller';
+import { ListErrandController } from '../controllers/list-errands.controller';
+import { UpdateErrandController } from '../controllers/update-errand.controller.ts';
 import { ErrandRepository } from '../repositories/errand.repository';
 import { CreateErrandUsecase } from '../usecases/create-errand.usecase';
 import { DeleteErrandUsecase } from '../usecases/delete-errands.usecase';
@@ -8,42 +12,61 @@ import { GetErrandUseCase } from '../usecases/get-errand.usecase';
 import { ListErrandsUseCase } from '../usecases/list-errands.usecase';
 import { UpdateErrandsUseCase } from '../usecases/update-errand.usecase';
 
-export function CreateErrandController() {
-    const userRepoSigleton = new UserRepository();
-    const errandRepoSigleton = new ErrandRepository();
-    const cacheRepoSigleton = new CacheRepository();
+export class ErrandController {
+    private get userRepository() {
+        return new UserRepository();
+    }
 
-    const createUsecase = new CreateErrandUsecase(
-        userRepoSigleton,
-        errandRepoSigleton,
-        cacheRepoSigleton
-    );
-    const listUsecase = new ListErrandsUseCase(
-        userRepoSigleton,
-        errandRepoSigleton,
-        cacheRepoSigleton
-    );
-    const getUsecase = new GetErrandUseCase(
-        userRepoSigleton,
-        errandRepoSigleton,
-        cacheRepoSigleton
-    );
-    const deleteUsecase = new DeleteErrandUsecase(
-        userRepoSigleton,
-        errandRepoSigleton,
-        cacheRepoSigleton
-    );
-    const updateUsecase = new UpdateErrandsUseCase(
-        userRepoSigleton,
-        errandRepoSigleton,
-        cacheRepoSigleton
-    );
+    private get errandRepository() {
+        return new ErrandRepository();
+    }
 
-    return new ErrandController(
-        createUsecase,
-        listUsecase,
-        getUsecase,
-        deleteUsecase,
-        updateUsecase
-    );
+    private get cacheRepository() {
+        return new CacheRepository();
+    }
+
+    public get createUsecase() {
+        const createUsecase = new CreateErrandUsecase(
+            this.userRepository,
+            this.errandRepository,
+            this.cacheRepository
+        );
+        return new CreateErrandController(createUsecase);
+    }
+
+    public get listUsecase() {
+        const listUsecase = new ListErrandsUseCase(
+            this.userRepository,
+            this.errandRepository,
+            this.cacheRepository
+        );
+        return new ListErrandController(listUsecase);
+    }
+
+    public get getUsecase() {
+        const getUsecase = new GetErrandUseCase(
+            this.userRepository,
+            this.errandRepository,
+            this.cacheRepository
+        );
+        return new GetErrandController(getUsecase);
+    }
+
+    public get deleteUsecase() {
+        const deleteUsecase = new DeleteErrandUsecase(
+            this.userRepository,
+            this.errandRepository,
+            this.cacheRepository
+        );
+        return new DeleteErrandController(deleteUsecase);
+    }
+
+    public get updateUsecase() {
+        const updateUsecase = new UpdateErrandsUseCase(
+            this.userRepository,
+            this.errandRepository,
+            this.cacheRepository
+        );
+        return new UpdateErrandController(updateUsecase);
+    }
 }
