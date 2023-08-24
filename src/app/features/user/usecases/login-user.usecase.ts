@@ -23,8 +23,8 @@ export class LoginUsecase {
         const token = new JwtService().createToken(user.toJson());
 
         return Return.success('Login successfully done', {
-            ...user.toJson(),
-            token,
+            id: user.id,
+            token: token,
         });
     }
 }

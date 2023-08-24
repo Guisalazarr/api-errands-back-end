@@ -11,7 +11,7 @@ if (process.env.DB_ENV === 'production') {
     migrations = ['build/app/shared/database/migrations/**/*.js'];
 }
 
-const config = new DataSource({
+let config = new DataSource({
     type: 'postgres',
     port: 5432,
     host: process.env.DB_HOST,
@@ -26,5 +26,15 @@ const config = new DataSource({
     entities: entities,
     migrations: migrations,
 });
+
+if (process.env.DB_ENV === 'test') {
+    config = new DataSource({
+        type: 'sqlite',
+        database: 'db.sqlite3',
+        synchronize: false,
+        entities: entities,
+        migrations: ['tests/app/shared/database/migrations/**/*.ts'],
+    });
+}
 
 export default config;

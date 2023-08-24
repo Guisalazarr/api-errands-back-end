@@ -8,7 +8,7 @@ export class ListUserUsecase {
         const result = await this.userRepository.list();
 
         return Return.success(
-            'User successfully obtained',
+            'Users successully listed',
             result.map((user) => user.toJson())
         );
     }
