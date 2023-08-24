@@ -33,4 +33,13 @@ export class Return {
             code: 200,
         };
     }
+
+    public static create(entity: string, data: any): Result {
+        return {
+            ok: true,
+            message: `${entity} created successfully`,
+            data,
+            code: 201,
+        };
+    }
 }
