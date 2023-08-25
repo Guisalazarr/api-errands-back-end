@@ -43,6 +43,6 @@ export class GetErrandUseCase {
 
         await this.cacheRepository.set(`errand-${params.errandId}`, result);
 
-        return Return.success('Errands successfully listed', result);
+        return Return.success('Errand succesfully obtained', result);
     }
 }
