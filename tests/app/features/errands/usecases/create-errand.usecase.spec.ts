@@ -7,7 +7,7 @@ import { CacheRepository } from '../../../../../src/app/shared/database/reposito
 import { User } from '../../../../../src/app/models/user.models';
 import { Errand } from '../../../../../src/app/models/errand.models';
 
-describe('Testes unitários do create Errands usecase', () => {
+describe('Testes unitários do create Errand usecase', () => {
     beforeAll(async () => {
         await Database.connect();
         await CacheDatabase.connect();
@@ -51,7 +51,7 @@ describe('Testes unitários do create Errands usecase', () => {
         expect(result).not.toHaveProperty('data');
     });
 
-    test('deveria retornar 200 se o recado for cadastrado com sucesso', async () => {
+    test('deveria retornar 201 se o recado for cadastrado com sucesso', async () => {
         const sut = createSut();
 
         jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
@@ -67,9 +67,9 @@ describe('Testes unitários do create Errands usecase', () => {
         });
 
         expect(result).toBeDefined();
-        expect(result.code).toBe(200);
+        expect(result.code).toBe(201);
         expect(result.ok).toBe(true);
-        expect(result.message).toEqual('Errand successfully created');
+        expect(result.message).toEqual('Errand created successfully');
 
         expect(result).toHaveProperty('data');
         expect(result.data).toHaveProperty('id');

@@ -30,6 +30,6 @@ export class CreateErrandUsecase {
 
         await this.cacheRepository.delete(`errands-${params.userId}`);
 
-        return Return.success('Errand successfully created', errand.toJson());
+        return Return.create('Errand', errand.toJson());
     }
 }

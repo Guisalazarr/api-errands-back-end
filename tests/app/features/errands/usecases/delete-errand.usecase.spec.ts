@@ -17,6 +17,13 @@ describe('Testes unitários do delete Errands usecase', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.resetAllMocks();
+
+        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
+        jest.spyOn(CacheRepository.prototype, 'delete').mockResolvedValue();
+        jest.spyOn(ErrandRepository.prototype, 'delete').mockResolvedValue(1);
+        jest.spyOn(ErrandRepository.prototype, 'list').mockResolvedValue([
+            errand,
+        ]);
     });
 
     function createSut() {
@@ -52,10 +59,9 @@ describe('Testes unitários do delete Errands usecase', () => {
         expect(result).not.toHaveProperty('data');
     });
 
-    test('deveria retornar 404 se o recad não existir', async () => {
+    test('deveria retornar 404 se o recado não existir', async () => {
         const sut = createSut();
 
-        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
         jest.spyOn(ErrandRepository.prototype, 'delete').mockResolvedValue(0);
 
         const result = await sut.execute({
@@ -72,12 +78,6 @@ describe('Testes unitários do delete Errands usecase', () => {
 
     test('deveria retornar 200 e a lista de recados atualizada se o recado for deletado com sucesso', async () => {
         const sut = createSut();
-
-        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
-        jest.spyOn(ErrandRepository.prototype, 'delete').mockResolvedValue(1);
-        jest.spyOn(ErrandRepository.prototype, 'list').mockResolvedValue([
-            errand,
-        ]);
 
         const result = await sut.execute({
             userId: user.id,

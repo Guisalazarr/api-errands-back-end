@@ -13,6 +13,11 @@ describe('Testes unitários do login user usecase', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.resetAllMocks();
+
+        jest.spyOn(UserRepository.prototype, 'getByEmail').mockResolvedValue(
+            user
+        );
     });
 
     const user = new User('any_name', 'any_email', 'any_password');
@@ -43,10 +48,6 @@ describe('Testes unitários do login user usecase', () => {
     test('deveria retornar acesso não autorizado se a senha estiver incorreta', async () => {
         const sut = createSut();
 
-        jest.spyOn(UserRepository.prototype, 'getByEmail').mockResolvedValue(
-            user
-        );
-
         const result = await sut.execute({
             email: 'any_email',
             password: 'wrong_password',
@@ -60,10 +61,6 @@ describe('Testes unitários do login user usecase', () => {
 
     test('deveria retornar sucesso se as credenciais estiverem corretas', async () => {
         const sut = createSut();
-
-        jest.spyOn(UserRepository.prototype, 'getByEmail').mockResolvedValue(
-            user
-        );
 
         const token = new JwtService().createToken(user.toJson());
 

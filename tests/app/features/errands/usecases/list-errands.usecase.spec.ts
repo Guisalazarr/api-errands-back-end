@@ -16,6 +16,13 @@ describe('Testes unitários do list Errands usecase', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.resetAllMocks();
+
+        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
+        jest.spyOn(ErrandRepository.prototype, 'list').mockResolvedValue(
+            errands
+        );
+        jest.spyOn(CacheRepository.prototype, 'get').mockResolvedValue(errands);
+        jest.spyOn(CacheRepository.prototype, 'set').mockResolvedValue();
     });
 
     function createSut() {
@@ -31,6 +38,7 @@ describe('Testes unitários do list Errands usecase', () => {
 
     const user = new User('any_name', 'any_email', 'any_password');
     const errand = new Errand('any_title', 'any_description', user);
+    const errands = [errand];
 
     test('deveria retornar usuário não encontrado se o usuário não foi localizado', async () => {
         const sut = createSut();
@@ -53,11 +61,6 @@ describe('Testes unitários do list Errands usecase', () => {
     test('deveria retornar sucesso e indicação de cache se houve cache para a lista de recados', async () => {
         const sut = createSut();
 
-        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
-        jest.spyOn(CacheRepository.prototype, 'get').mockResolvedValue([
-            errand,
-        ]);
-
         const result = await sut.execute({
             userId: user.id,
             title: errand.title,
@@ -68,15 +71,14 @@ describe('Testes unitários do list Errands usecase', () => {
         expect(result.code).toBe(200);
         expect(result.ok).toBe(true);
         expect(result.message).toEqual('Errands successfully listed(cache)');
-        expect(result).toHaveProperty('data', [errand]);
+        expect(result).toHaveProperty('data', errands);
     });
 
     test('deveria retornar sucesso sem indicação de cache se não houve cache para a lista de recados', async () => {
         const sut = createSut();
 
-        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
         jest.spyOn(CacheRepository.prototype, 'get').mockResolvedValue(null);
-        jest.spyOn(CacheRepository.prototype, 'set').mockResolvedValue();
+        jest.spyOn(ErrandRepository.prototype, 'list').mockResolvedValue([]);
 
         const result = await sut.execute({ userId: user.id });
 
@@ -91,12 +93,7 @@ describe('Testes unitários do list Errands usecase', () => {
     test('deveria retornar sucesso e 1 de recado cadastrado', async () => {
         const sut = createSut();
 
-        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
-        jest.spyOn(ErrandRepository.prototype, 'list').mockResolvedValue([
-            errand,
-        ]);
         jest.spyOn(CacheRepository.prototype, 'get').mockResolvedValue(null);
-        jest.spyOn(CacheRepository.prototype, 'set').mockResolvedValue();
 
         const result = await sut.execute({ userId: user.id });
 
@@ -104,7 +101,10 @@ describe('Testes unitários do list Errands usecase', () => {
         expect(result.code).toBe(200);
         expect(result.ok).toBe(true);
         expect(result.message).toEqual('Errands successfully listed');
-        expect(result).toHaveProperty('data', [errand.toJson()]);
+        expect(result).toHaveProperty(
+            'data',
+            errands.map((errand) => errand.toJson())
+        );
         expect(result.data).toHaveLength(1);
     });
 });

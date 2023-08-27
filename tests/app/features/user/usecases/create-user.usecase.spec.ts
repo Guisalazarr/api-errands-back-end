@@ -13,6 +13,11 @@ describe('Testes unitários do create user usecase', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.resetAllMocks();
+
+        jest.spyOn(UserRepository.prototype, 'getByEmail').mockResolvedValue(
+            user
+        );
+        jest.spyOn(UserRepository.prototype, 'create').mockResolvedValue();
     });
 
     const user = new User('any_name', 'any_email', 'any_password');
@@ -24,10 +29,6 @@ describe('Testes unitários do create user usecase', () => {
 
     test('deveria retornar email já registrado caso o email já tinha sido cadastrado', async () => {
         const sut = createSut();
-
-        jest.spyOn(UserRepository.prototype, 'getByEmail').mockResolvedValue(
-            user
-        );
 
         const result = await sut.execute({
             name: user.name,
@@ -48,8 +49,6 @@ describe('Testes unitários do create user usecase', () => {
         jest.spyOn(UserRepository.prototype, 'getByEmail').mockResolvedValue(
             undefined
         );
-
-        jest.spyOn(UserRepository.prototype, 'create').mockResolvedValue();
 
         const result = await sut.execute({
             name: user.name,

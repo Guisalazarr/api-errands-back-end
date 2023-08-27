@@ -13,6 +13,8 @@ describe('Testes unitários do get user usecase', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.resetAllMocks();
+
+        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
     });
 
     const user = new User('any_name', 'any_email', 'any_password,');
@@ -39,8 +41,6 @@ describe('Testes unitários do get user usecase', () => {
 
     test('deveria sucesso se o usuario existir', async () => {
         const sut = createSut();
-
-        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
 
         const result = await sut.execute(user.id);
 

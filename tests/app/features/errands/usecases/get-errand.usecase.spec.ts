@@ -16,6 +16,13 @@ describe('Testes unitários do get Errands usecase', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.resetAllMocks();
+
+        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
+        jest.spyOn(ErrandRepository.prototype, 'get').mockResolvedValue(errand);
+        jest.spyOn(CacheRepository.prototype, 'get').mockResolvedValue([
+            errand,
+        ]);
+        jest.spyOn(CacheRepository.prototype, 'set').mockResolvedValue();
     });
 
     function createSut() {
@@ -54,11 +61,6 @@ describe('Testes unitários do get Errands usecase', () => {
     test('deveria retornar 200 e indicação de cache se houver cache para a o recado', async () => {
         const sut = createSut();
 
-        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
-        jest.spyOn(CacheRepository.prototype, 'get').mockResolvedValue([
-            errand,
-        ]);
-
         const result = await sut.execute({
             userId: user.id,
             errandId: errand.id,
@@ -75,7 +77,6 @@ describe('Testes unitários do get Errands usecase', () => {
     test('deveria retornar 404 se o recado não foi encontrado', async () => {
         const sut = createSut();
 
-        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
         jest.spyOn(ErrandRepository.prototype, 'get').mockResolvedValue(
             undefined
         );
@@ -96,10 +97,7 @@ describe('Testes unitários do get Errands usecase', () => {
     test('deveria retornar 200 se o recado for encontrado', async () => {
         const sut = createSut();
 
-        jest.spyOn(UserRepository.prototype, 'get').mockResolvedValue(user);
-        jest.spyOn(ErrandRepository.prototype, 'get').mockResolvedValue(errand);
         jest.spyOn(CacheRepository.prototype, 'get').mockResolvedValue(null);
-        jest.spyOn(CacheRepository.prototype, 'set').mockResolvedValue();
 
         const result = await sut.execute({
             userId: user.id,
