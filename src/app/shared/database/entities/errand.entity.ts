@@ -1,49 +1,49 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
-import { ErrandStatus } from '../../../models/errand.models';
-import { UserEntity } from './user.entity';
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { ErrandStatus } from "../../../models/errand.models";
+import { UserEntity } from "./user.entity";
 
-@Entity('errand')
+@Entity("errand")
 export class ErrandEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column()
-    title: string;
+  @Column()
+  title: string;
 
-    @Column()
-    description: string;
+  @Column()
+  description: string;
 
-    @Column({
-        enum: ErrandStatus,
-    })
-    status: string;
+  @Column({
+    enum: ErrandStatus,
+  })
+  status: string;
 
-    @CreateDateColumn({
-        name: 'created_at',
-    })
-    createdAt: Date;
+  @CreateDateColumn({
+    name: "created_at",
+  })
+  createdAt: Date;
 
-    @UpdateDateColumn({
-        name: 'updated_at',
-    })
-    updatedAt: Date;
+  @UpdateDateColumn({
+    name: "updated_at",
+  })
+  updatedAt: Date;
 
-    @Column({
-        name: 'id_user',
-    })
-    idUser: string;
+  @Column({
+    name: "id_user",
+  })
+  idUser: string;
 
-    @ManyToOne(() => UserEntity, {
-        eager: true,
-    })
-    @JoinColumn({ name: 'id_user' })
-    user: UserEntity;
+  @ManyToOne(() => UserEntity, {
+    eager: true,
+  })
+  @JoinColumn({ name: "id_user" })
+  user: UserEntity;
 }

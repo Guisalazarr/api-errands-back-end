@@ -18,9 +18,6 @@ export class UserValidator {
             if (!email) {
                 return ApiResponse.notProvided(res, 'Email');
             }
-            if (!password) {
-                return ApiResponse.notProvided(res, 'Password');
-            }
 
             if (!email.match(validEmail)) {
                 return ApiResponse.invalidField(res, 'Email');

@@ -26,10 +26,6 @@ export class User {
         return this._password;
     }
 
-    public set name(name: string) {
-        this._name = name;
-    }
-
     public toJson() {
         return {
             id: this._id,

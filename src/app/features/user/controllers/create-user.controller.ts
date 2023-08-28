@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 import { ApiResponse } from '../../../shared/util/http-response.adapter';
-import { GetUserUsecase } from '../usecases/get-user.usecase';
-import { ListUserUsecase } from '../usecases/list-user.usecase';
 import { CreateUserUsecase } from '../usecases/create-user.usecase';
 
 export class CreateUserController {
