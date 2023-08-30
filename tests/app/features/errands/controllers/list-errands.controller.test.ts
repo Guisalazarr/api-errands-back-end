@@ -10,7 +10,7 @@ import { JwtService } from '../../../../../src/app/shared/service/jwt.service';
 import { Errand } from '../../../../../src/app/models/errand.models';
 import { ErrandRepository } from '../../../../../src/app/features/errands/repositories/errand.repository';
 
-describe('Testando criação de recados', () => {
+describe('Testando listagem de recados', () => {
     beforeAll(async () => {
         await Database.connect();
         await CacheDatabase.connect();
@@ -55,12 +55,13 @@ describe('Testando criação de recados', () => {
     const user = new User('any_name', 'any_email.com', 'any_password');
     const token = new JwtService().createToken(user.toJson());
     const errand = new Errand('any_name', 'any_description', user);
+    const errand2 = new Errand('any_name', 'any_description', user);
 
     const route = `/user/${user.id}/errand`;
 
     test('deveria retornar erro 401 se o token não for informado', async () => {
         const sut = createSut();
-        const result = await request(sut).post(route).send();
+        const result = await request(sut).get(route).send();
 
         expect(result).toBeDefined();
         expect(result.ok).toBe(false);
@@ -73,7 +74,7 @@ describe('Testando criação de recados', () => {
     test('deveria retornar erro 401 se o token for informado inválido', async () => {
         const sut = createSut();
         const result = await request(sut)
-            .post(route)
+            .get(route)
             .set('Authorization', '1234')
             .send();
 
@@ -86,48 +87,13 @@ describe('Testando criação de recados', () => {
         expect(result.body).not.toHaveProperty('data');
     });
 
-    test('deveria retornar erro 400 se o title não for informado', async () => {
-        const sut = createSut();
-        const result = await request(sut)
-            .post(route)
-            .set('Authorization', token)
-            .send();
-
-        expect(result).toBeDefined();
-        expect(result.ok).toBe(false);
-        expect(result.status).toBe(400);
-        expect(result).toHaveProperty('body.ok');
-        expect(result.body.ok).toBe(false);
-        expect(result.body.message).toBe('Title was not provided');
-    });
-
-    test('deveria retornar erro 400 se a description não for informada', async () => {
-        const sut = createSut();
-        const result = await request(sut)
-            .post(route)
-            .set('Authorization', token)
-            .send({
-                title: 'any_title',
-            });
-
-        expect(result).toBeDefined();
-        expect(result.ok).toBe(false);
-        expect(result.status).toBe(400);
-        expect(result).toHaveProperty('body.ok');
-        expect(result.body.ok).toBe(false);
-        expect(result.body.message).toBe('Description was not provided');
-    });
-
     test('deveria retornar erro 404 se o user não for localizado', async () => {
         const sut = createSut();
 
         const result = await request(sut)
-            .post(route)
+            .get(route)
             .set('Authorization', token)
-            .send({
-                title: 'any_title',
-                description: 'any_description',
-            });
+            .send();
 
         expect(result).toBeDefined();
         expect(result.ok).toBe(false);
@@ -137,26 +103,45 @@ describe('Testando criação de recados', () => {
         expect(result.body.message).toBe('User not found');
     });
 
-    test('deveria retornar 201 se o recado for cadastrado com sucesso', async () => {
+    test('deveria retornar 200 e a lista de recados vazia', async () => {
         const sut = createSut();
         await createUser(user);
-
         const result = await request(sut)
-            .post(route)
+            .get(route)
             .set('Authorization', token)
-            .send({
-                title: 'any_title',
-                description: 'any_description',
-            });
-
-        await createErrand(errand);
+            .send();
 
         expect(result).toBeDefined();
         expect(result.ok).toBe(true);
-        expect(result.status).toBe(201);
+        expect(result.status).toBe(200);
         expect(result).toHaveProperty('body.ok');
         expect(result.body.ok).toBe(true);
-        expect(result.body.message).toBe('Errand created successfully');
-        expect(result.body).toHaveProperty('data');
+        expect(result.body.message).toBe('Errands successfully listed');
+        expect(result.body).toHaveProperty('data', []);
+        expect(result.body.data).toHaveLength(0);
+    });
+
+    test('deveria retornar 200 e a lista com 2 recados cadastrados', async () => {
+        const sut = createSut();
+        await createUser(user);
+        await createErrand(errand);
+        await createErrand(errand2);
+
+        const result = await request(sut)
+            .get(route)
+            .set('Authorization', token)
+            .send();
+
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(true);
+        expect(result.status).toBe(200);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(true);
+        expect(result.body.message).toBe('Errands successfully listed');
+        expect(result.body).toHaveProperty('data', [
+            errand.toJson(),
+            errand2.toJson(),
+        ]);
+        expect(result.body.data).toHaveLength(2);
     });
 });
