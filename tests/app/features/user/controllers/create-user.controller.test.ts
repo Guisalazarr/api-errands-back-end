@@ -1,208 +1,217 @@
-import request from "supertest";
-import { Database } from "../../../../../src/main/database/database.connection";
-import { CacheDatabase } from "../../../../../src/main/database/redis.connection";
-import { UserEntity } from "../../../../../src/app/shared/database/entities/user.entity";
-import { ErrandEntity } from "../../../../../src/app/shared/database/entities/errand.entity";
-import { User } from "../../../../../src/app/models/user.models";
-import { createApp } from "../../../../../src/main/config/express.config";
-import { UserRepository } from "../../../../../src/app/features/user/repositories/user.repository";
+import request from 'supertest';
+import { Database } from '../../../../../src/main/database/database.connection';
+import { CacheDatabase } from '../../../../../src/main/database/redis.connection';
+import { UserEntity } from '../../../../../src/app/shared/database/entities/user.entity';
+import { ErrandEntity } from '../../../../../src/app/shared/database/entities/errand.entity';
+import { User } from '../../../../../src/app/models/user.models';
+import { createApp } from '../../../../../src/main/config/express.config';
+import { UserRepository } from '../../../../../src/app/features/user/repositories/user.repository';
 
-describe("Testando criação de usuário", () => {
-  beforeAll(async () => {
-    await Database.connect();
-    await CacheDatabase.connect();
-  });
-
-  beforeEach(async () => {
-    const database = Database.connection;
-    const userRepository = database.getRepository(UserEntity);
-    const errandRepository = database.getRepository(ErrandEntity);
-
-    await errandRepository.clear();
-    await userRepository.clear();
-
-    const cache = CacheDatabase.connection;
-    await cache.flushall();
-  });
-
-  afterAll(async () => {
-    await Database.connection.destroy();
-    await CacheDatabase.connection.quit();
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-    jest.resetAllMocks();
-  });
-
-  const createUser = async (user: User) => {
-    const repository = new UserRepository();
-    await repository.create(user);
-  };
-
-  const createSut = () => {
-    return createApp();
-  };
-
-  const route = "/user/login";
-  test("deveria retornar erro 400 se o name não for informado", async () => {
-    const sut = createSut();
-    const result = await request(sut).post("/user").send();
-
-    expect(result).toBeDefined();
-    expect(result.ok).toBe(false);
-    expect(result.status).toBe(400);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(false);
-    expect(result.body.message).toBe("Name was not provided");
-  });
-
-  test("deveria retornar erro 400 se o email não for informado", async () => {
-    const sut = createSut();
-    const result = await request(sut).post("/user").send({
-      name: "any_name",
+describe('Testando criação de usuário', () => {
+    beforeAll(async () => {
+        await Database.connect();
+        await CacheDatabase.connect();
     });
 
-    expect(result).toBeDefined();
-    expect(result.ok).toBe(false);
-    expect(result.status).toBe(400);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(false);
-    expect(result.body.message).toBe("Email was not provided");
-  });
+    beforeEach(async () => {
+        const database = Database.connection;
+        const userRepository = database.getRepository(UserEntity);
+        const errandRepository = database.getRepository(ErrandEntity);
 
-  test("deveria retornar erro 400 se o password não for informado", async () => {
-    const sut = createSut();
-    const result = await request(sut).post("/user").send({
-      name: "any_name",
-      email: "any_email@teste.com",
+        await errandRepository.clear();
+        await userRepository.clear();
+
+        const cache = CacheDatabase.connection;
+        await cache.flushall();
     });
 
-    expect(result).toBeDefined();
-    expect(result.ok).toBe(false);
-    expect(result.status).toBe(400);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(false);
-    expect(result.body.message).toBe("Password was not provided");
-  });
-  test("deveria retornar erro 400 se o email for informado inválido", async () => {
-    const sut = createSut();
-    const result = await request(sut).post("/user").send({
-      name: "any_name",
-      email: "any_email.com",
-      password: "1234",
+    afterAll(async () => {
+        await Database.connection.destroy();
+        await CacheDatabase.connection.quit();
     });
 
-    expect(result).toBeDefined();
-    expect(result.ok).toBe(false);
-    expect(result.status).toBe(400);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(false);
-    expect(result.body.message).toBe("Email is invalid");
-  });
-
-  test("deveria retornar erro 400 se o password menor que 4", async () => {
-    const sut = createSut();
-    const result = await request(sut).post("/user").send({
-      name: "any_name",
-      email: "any_email@any.com",
-      password: "123",
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.resetAllMocks();
     });
 
-    expect(result).toBeDefined();
-    expect(result.ok).toBe(false);
-    expect(result.status).toBe(400);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(false);
-    expect(result.body.message).toBe("Password must be at least 4 characters");
-  });
+    const createUser = async (user: User) => {
+        const repository = new UserRepository();
+        await repository.create(user);
+    };
 
-  test("deveria retornar erro 400 se o password for maior que 12", async () => {
-    const sut = createSut();
-    const result = await request(sut).post("/user").send({
-      name: "any_name",
-      email: "any_email@any.com",
-      password: "123456789101112",
+    const createSut = () => {
+        return createApp();
+    };
+
+    test('deveria retornar erro 400 se o name não for informado', async () => {
+        const sut = createSut();
+        const result = await request(sut).post('/user').send();
+
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(false);
+        expect(result.status).toBe(400);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(false);
+        expect(result.body.message).toBe('Name was not provided');
     });
 
-    expect(result).toBeDefined();
-    expect(result.ok).toBe(false);
-    expect(result.status).toBe(400);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(false);
-    expect(result.body.message).toBe(
-      "Password must be at most minus 12 characters"
-    );
-  });
+    test('deveria retornar erro 400 se o email não for informado', async () => {
+        const sut = createSut();
+        const result = await request(sut).post('/user').send({
+            name: 'any_name',
+        });
 
-  test("deveria retornar erro 400 se as o repeat Password não for informado", async () => {
-    const sut = createSut();
-    const result = await request(sut).post("/user").send({
-      name: "any_name",
-      email: "any_email@any.com",
-      password: "any_password",
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(false);
+        expect(result.status).toBe(400);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(false);
+        expect(result.body.message).toBe('Email was not provided');
     });
 
-    expect(result).toBeDefined();
-    expect(result.ok).toBe(false);
-    expect(result.status).toBe(400);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(false);
-    expect(result.body.message).toBe("Repeat Password was not provided");
-  });
+    test('deveria retornar erro 400 se o password não for informado', async () => {
+        const sut = createSut();
+        const result = await request(sut).post('/user').send({
+            name: 'any_name',
+            email: 'any_email@teste.com',
+        });
 
-  test("deveria retornar erro 400 se as senhas forem divergentes", async () => {
-    const sut = createSut();
-    const result = await request(sut).post("/user").send({
-      name: "any_name",
-      email: "any_email@any.com",
-      password: "any_password",
-      repeatPassword: "wrong_password",
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(false);
+        expect(result.status).toBe(400);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(false);
+        expect(result.body.message).toBe('Password was not provided');
+    });
+    test('deveria retornar erro 400 se o email for informado inválido', async () => {
+        const sut = createSut();
+        const result = await request(sut).post('/user').send({
+            name: 'any_name',
+            email: 'any_email.com',
+            password: '1234',
+        });
+
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(false);
+        expect(result.status).toBe(400);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(false);
+        expect(result.body.message).toBe('Email is invalid');
     });
 
-    expect(result).toBeDefined();
-    expect(result.ok).toBe(false);
-    expect(result.status).toBe(400);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(false);
-    expect(result.body.message).toBe("The passwords were not match");
-  });
+    test('deveria retornar erro 400 se o password menor que 4', async () => {
+        const sut = createSut();
+        const result = await request(sut).post('/user').send({
+            name: 'any_name',
+            email: 'any_email@any.com',
+            password: '123',
+        });
 
-  test("deveria retornar erro 400 se o email já está cadastrado", async () => {
-    const sut = createSut();
-    const user = new User("any_name", "any_email@teste.com", "any_password");
-    await createUser(user);
-    const result = await request(sut).post("/user").send({
-      name: "any_name",
-      email: "any_email@teste.com",
-      password: "any_password",
-      repeatPassword: "any_password",
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(false);
+        expect(result.status).toBe(400);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(false);
+        expect(result.body.message).toBe(
+            'Password must be at least 4 characters'
+        );
     });
 
-    expect(result).toBeDefined();
-    expect(result.ok).toBe(false);
-    expect(result.status).toBe(400);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(false);
-    expect(result.body.message).toBe("Email already registered");
-  });
+    test('deveria retornar erro 400 se o password for maior que 12', async () => {
+        const sut = createSut();
+        const result = await request(sut).post('/user').send({
+            name: 'any_name',
+            email: 'any_email@any.com',
+            password: '123456789101112',
+        });
 
-  test("deveria retornar 201 se o usuário for cadastrado com sucesso", async () => {
-    const sut = createSut();
-    const user = new User("any_name", "any_email@teste.com", "any_password");
-    await createUser(user);
-
-    const result = await request(sut).post("/user").send({
-      name: "newUser",
-      email: "newemail@teste.com",
-      password: "12345",
-      repeatPassword: "12345",
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(false);
+        expect(result.status).toBe(400);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(false);
+        expect(result.body.message).toBe(
+            'Password must be at most minus 12 characters'
+        );
     });
-    expect(result).toBeDefined();
-    expect(result.status).toEqual(201);
-    expect(result).toHaveProperty("body.ok");
-    expect(result.body.ok).toBe(true);
-    expect(result.body.message).toBe("User created successfully");
-    expect(result.body).toHaveProperty("data");
-  });
+
+    test('deveria retornar erro 400 se as o repeat Password não for informado', async () => {
+        const sut = createSut();
+        const result = await request(sut).post('/user').send({
+            name: 'any_name',
+            email: 'any_email@any.com',
+            password: 'any_password',
+        });
+
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(false);
+        expect(result.status).toBe(400);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(false);
+        expect(result.body.message).toBe('Repeat Password was not provided');
+    });
+
+    test('deveria retornar erro 400 se as senhas forem divergentes', async () => {
+        const sut = createSut();
+        const result = await request(sut).post('/user').send({
+            name: 'any_name',
+            email: 'any_email@any.com',
+            password: 'any_password',
+            repeatPassword: 'wrong_password',
+        });
+
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(false);
+        expect(result.status).toBe(400);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(false);
+        expect(result.body.message).toBe('The passwords were not match');
+    });
+
+    test('deveria retornar erro 400 se o email já está cadastrado', async () => {
+        const sut = createSut();
+        const user = new User(
+            'any_name',
+            'any_email@teste.com',
+            'any_password'
+        );
+        await createUser(user);
+        const result = await request(sut).post('/user').send({
+            name: 'any_name',
+            email: 'any_email@teste.com',
+            password: 'any_password',
+            repeatPassword: 'any_password',
+        });
+
+        expect(result).toBeDefined();
+        expect(result.ok).toBe(false);
+        expect(result.status).toBe(400);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(false);
+        expect(result.body.message).toBe('Email already registered');
+    });
+
+    test('deveria retornar 201 se o usuário for cadastrado com sucesso', async () => {
+        const sut = createSut();
+        const user = new User(
+            'any_name',
+            'any_email@teste.com',
+            'any_password'
+        );
+        await createUser(user);
+
+        const result = await request(sut).post('/user').send({
+            name: 'newUser',
+            email: 'newemail@teste.com',
+            password: '12345',
+            repeatPassword: '12345',
+        });
+        expect(result).toBeDefined();
+        expect(result.status).toEqual(201);
+        expect(result).toHaveProperty('body.ok');
+        expect(result.body.ok).toBe(true);
+        expect(result.body.message).toBe('User created successfully');
+        expect(result.body).toHaveProperty('data');
+    });
 });
