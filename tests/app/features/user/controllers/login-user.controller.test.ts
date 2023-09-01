@@ -6,6 +6,7 @@ import { UserEntity } from '../../../../../src/app/shared/database/entities/user
 import { User } from '../../../../../src/app/models/user.models';
 import { UserRepository } from '../../../../../src/app/features/user/repositories/user.repository';
 import { ErrandEntity } from '../../../../../src/app/shared/database/entities/errand.entity';
+import { LoginUsecase } from '../../../../../src/app/features/user/usecases/login-user.usecase';
 
 describe('testando login de usuário', () => {
     beforeAll(async () => {
@@ -30,15 +31,25 @@ describe('testando login de usuário', () => {
         await CacheDatabase.connection.quit();
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.resetAllMocks();
+    });
+
     const createUser = async (user: User) => {
         const repository = new UserRepository();
         await repository.create(user);
     };
 
-    const sut = createApp();
+    const createSut = () => {
+        return createApp();
+    };
+
+    const route = '/user/login';
 
     test('deveria retornar erro 400 se o email não for informado', async () => {
-        const result = await request(sut).post('/user/login').send();
+        const sut = createSut();
+        const result = await request(sut).post(route).send();
 
         expect(result).toBeDefined();
         expect(result.ok).toBe(false);
@@ -49,7 +60,8 @@ describe('testando login de usuário', () => {
     });
 
     test('deveria retornar erro 400 se o password não for informado', async () => {
-        const result = await request(sut).post('/user/login').send({
+        const sut = createSut();
+        const result = await request(sut).post(route).send({
             email: 'any_email@teste.com.br',
         });
 
@@ -62,7 +74,8 @@ describe('testando login de usuário', () => {
     });
 
     test('deveria retornar erro 400 se o email for inválido', async () => {
-        const result = await request(sut).post('/user/login').send({
+        const sut = createSut();
+        const result = await request(sut).post(route).send({
             email: 'any_email',
             password: 'any_password',
         });
@@ -76,6 +89,7 @@ describe('testando login de usuário', () => {
     });
 
     test('deveria retornar erro 401 se o user não existir', async () => {
+        const sut = createSut();
         const user = new User(
             'any_name',
             'any_email@teste.com',
@@ -83,7 +97,7 @@ describe('testando login de usuário', () => {
         );
         await createUser(user);
 
-        const result = await request(sut).post('/user/login').send({
+        const result = await request(sut).post(route).send({
             email: 'wrong_email@teste.com',
             password: 'any_password',
         });
@@ -97,6 +111,7 @@ describe('testando login de usuário', () => {
     });
 
     test('deveria retornar erro 401 se a senha for incorreta', async () => {
+        const sut = createSut();
         const user = new User(
             'any_name',
             'any_email@teste.com',
@@ -104,7 +119,7 @@ describe('testando login de usuário', () => {
         );
         await createUser(user);
 
-        const result = await request(sut).post('/user/login').send({
+        const result = await request(sut).post(route).send({
             email: 'any_email@teste.com',
             password: 'wrong_password',
         });
@@ -118,6 +133,7 @@ describe('testando login de usuário', () => {
     });
 
     test('deveria retornar 200 se as credencias estiveram corretas', async () => {
+        const sut = createSut();
         const user = new User(
             'any_name',
             'any_email@teste.com',
@@ -125,7 +141,7 @@ describe('testando login de usuário', () => {
         );
         await createUser(user);
 
-        const result = await request(sut).post('/user/login').send({
+        const result = await request(sut).post(route).send({
             email: 'any_email@teste.com',
             password: 'any_password',
         });
@@ -137,5 +153,24 @@ describe('testando login de usuário', () => {
         expect(result.body).toHaveProperty('ok', true);
         expect(result.body.code).toBe(200);
         expect(result.body.message).toBe('Login successfully done');
+    });
+
+    test('deveria retornar 500 se o usecase disparar uma exceção', async () => {
+        const sut = createSut();
+        jest.spyOn(LoginUsecase.prototype, 'execute').mockRejectedValue(
+            'Simulated Error'
+        );
+        const result = await request(sut).post(route).send({
+            email: 'teste@teste.com',
+            password: '12345',
+        });
+
+        expect(result).toBeDefined();
+        expect(result.status).toEqual(500);
+        expect(result).toHaveProperty('body');
+        expect(result.body).toHaveProperty('ok', false);
+        expect(result.body).toHaveProperty('message', 'Simulated Error');
+        expect(result.body).not.toHaveProperty('data');
+        expect(result.body).not.toHaveProperty('code');
     });
 });

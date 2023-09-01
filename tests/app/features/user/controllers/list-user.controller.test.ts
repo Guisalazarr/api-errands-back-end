@@ -6,6 +6,7 @@ import { ErrandEntity } from '../../../../../src/app/shared/database/entities/er
 import { User } from '../../../../../src/app/models/user.models';
 import { createApp } from '../../../../../src/main/config/express.config';
 import { UserRepository } from '../../../../../src/app/features/user/repositories/user.repository';
+import { ListUserUsecase } from '../../../../../src/app/features/user/usecases/list-user.usecase';
 
 describe('Testando listagem de usuário', () => {
     beforeAll(async () => {
@@ -40,6 +41,7 @@ describe('Testando listagem de usuário', () => {
         await repository.create(user);
     };
     const sut = createApp();
+    const route = '/user';
     const user1 = new User('any_name', 'any_email@teste.com', 'any_password');
     const user2 = new User(
         'any_name2',
@@ -51,7 +53,7 @@ describe('Testando listagem de usuário', () => {
         await createUser(user1);
         await createUser(user2);
 
-        const result = await request(sut).get('/user').send();
+        const result = await request(sut).get(route).send();
 
         expect(result).toBeDefined();
         expect(result.ok).toBe(true);
@@ -63,5 +65,20 @@ describe('Testando listagem de usuário', () => {
             user1.toJson(),
             user2.toJson(),
         ]);
+    });
+
+    test('deveria retornar 500 se o usecase disparar uma exceção', async () => {
+        jest.spyOn(ListUserUsecase.prototype, 'execute').mockRejectedValue(
+            'Simulated Error'
+        );
+        const result = await request(sut).get(route).send();
+
+        expect(result).toBeDefined();
+        expect(result.status).toEqual(500);
+        expect(result).toHaveProperty('body');
+        expect(result.body).toHaveProperty('ok', false);
+        expect(result.body).toHaveProperty('message', 'Simulated Error');
+        expect(result.body).not.toHaveProperty('data');
+        expect(result.body).not.toHaveProperty('code');
     });
 });

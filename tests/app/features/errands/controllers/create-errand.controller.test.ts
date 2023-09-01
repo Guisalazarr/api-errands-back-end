@@ -9,6 +9,7 @@ import { UserRepository } from '../../../../../src/app/features/user/repositorie
 import { JwtService } from '../../../../../src/app/shared/service/jwt.service';
 import { Errand } from '../../../../../src/app/models/errand.models';
 import { ErrandRepository } from '../../../../../src/app/features/errands/repositories/errand.repository';
+import { CreateErrandUsecase } from '../../../../../src/app/features/errands/usecases/create-errand.usecase';
 
 describe('Testando criação de recados', () => {
     beforeAll(async () => {
@@ -158,5 +159,27 @@ describe('Testando criação de recados', () => {
         expect(result.body.ok).toBe(true);
         expect(result.body.message).toBe('Errand created successfully');
         expect(result.body).toHaveProperty('data');
+    });
+
+    test('deveria retornar 500 se o usecase disparar uma exceção', async () => {
+        const sut = createSut();
+        jest.spyOn(CreateErrandUsecase.prototype, 'execute').mockRejectedValue(
+            'Simulated Error'
+        );
+        const result = await request(sut)
+            .post(route)
+            .set('Authorization', token)
+            .send({
+                title: 'any_title',
+                description: 'any_description',
+            });
+
+        expect(result).toBeDefined();
+        expect(result.status).toEqual(500);
+        expect(result).toHaveProperty('body');
+        expect(result.body).toHaveProperty('ok', false);
+        expect(result.body).toHaveProperty('message', 'Simulated Error');
+        expect(result.body).not.toHaveProperty('data');
+        expect(result.body).not.toHaveProperty('code');
     });
 });

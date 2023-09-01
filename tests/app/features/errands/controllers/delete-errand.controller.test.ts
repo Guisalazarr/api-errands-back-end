@@ -9,6 +9,7 @@ import { UserRepository } from '../../../../../src/app/features/user/repositorie
 import { JwtService } from '../../../../../src/app/shared/service/jwt.service';
 import { Errand } from '../../../../../src/app/models/errand.models';
 import { ErrandRepository } from '../../../../../src/app/features/errands/repositories/errand.repository';
+import { DeleteErrandUsecase } from '../../../../../src/app/features/errands/usecases/delete-errands.usecase';
 
 describe('Testando delete do recado por ID', () => {
     beforeAll(async () => {
@@ -140,5 +141,25 @@ describe('Testando delete do recado por ID', () => {
         expect(result.body.ok).toBe(true);
         expect(result.body.message).toBe('Errand successfully deleted');
         expect(result.body).toHaveProperty('data', [errand2.toJson()]);
+    });
+
+    test('deveria retornar 500 se o usecase disparar uma exceção', async () => {
+        const sut = createSut();
+
+        jest.spyOn(DeleteErrandUsecase.prototype, 'execute').mockRejectedValue(
+            'Simulated Error'
+        );
+        const result = await request(sut)
+            .delete(route)
+            .set('Authorization', token)
+            .send();
+
+        expect(result).toBeDefined();
+        expect(result.status).toEqual(500);
+        expect(result).toHaveProperty('body');
+        expect(result.body).toHaveProperty('ok', false);
+        expect(result.body).toHaveProperty('message', 'Simulated Error');
+        expect(result.body).not.toHaveProperty('data');
+        expect(result.body).not.toHaveProperty('code');
     });
 });

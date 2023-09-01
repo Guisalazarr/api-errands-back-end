@@ -40,7 +40,7 @@ export class ApiResponse {
     public static serverError(res: Response, error: any) {
         return res.status(500).send({
             ok: false,
-            error,
+            message: error.toString(),
         });
     }
 

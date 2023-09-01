@@ -6,6 +6,7 @@ import { ErrandEntity } from '../../../../../src/app/shared/database/entities/er
 import { User } from '../../../../../src/app/models/user.models';
 import { createApp } from '../../../../../src/main/config/express.config';
 import { UserRepository } from '../../../../../src/app/features/user/repositories/user.repository';
+import { CreateUserUsecase } from '../../../../../src/app/features/user/usecases/create-user.usecase';
 
 describe('Testando criação de usuário', () => {
     beforeAll(async () => {
@@ -43,10 +44,11 @@ describe('Testando criação de usuário', () => {
     const createSut = () => {
         return createApp();
     };
+    const route = '/user';
 
     test('deveria retornar erro 400 se o name não for informado', async () => {
         const sut = createSut();
-        const result = await request(sut).post('/user').send();
+        const result = await request(sut).post(route).send();
 
         expect(result).toBeDefined();
         expect(result.ok).toBe(false);
@@ -58,7 +60,7 @@ describe('Testando criação de usuário', () => {
 
     test('deveria retornar erro 400 se o email não for informado', async () => {
         const sut = createSut();
-        const result = await request(sut).post('/user').send({
+        const result = await request(sut).post(route).send({
             name: 'any_name',
         });
 
@@ -72,7 +74,7 @@ describe('Testando criação de usuário', () => {
 
     test('deveria retornar erro 400 se o password não for informado', async () => {
         const sut = createSut();
-        const result = await request(sut).post('/user').send({
+        const result = await request(sut).post(route).send({
             name: 'any_name',
             email: 'any_email@teste.com',
         });
@@ -86,7 +88,7 @@ describe('Testando criação de usuário', () => {
     });
     test('deveria retornar erro 400 se o email for informado inválido', async () => {
         const sut = createSut();
-        const result = await request(sut).post('/user').send({
+        const result = await request(sut).post(route).send({
             name: 'any_name',
             email: 'any_email.com',
             password: '1234',
@@ -102,7 +104,7 @@ describe('Testando criação de usuário', () => {
 
     test('deveria retornar erro 400 se o password menor que 4', async () => {
         const sut = createSut();
-        const result = await request(sut).post('/user').send({
+        const result = await request(sut).post(route).send({
             name: 'any_name',
             email: 'any_email@any.com',
             password: '123',
@@ -120,7 +122,7 @@ describe('Testando criação de usuário', () => {
 
     test('deveria retornar erro 400 se o password for maior que 12', async () => {
         const sut = createSut();
-        const result = await request(sut).post('/user').send({
+        const result = await request(sut).post(route).send({
             name: 'any_name',
             email: 'any_email@any.com',
             password: '123456789101112',
@@ -138,7 +140,7 @@ describe('Testando criação de usuário', () => {
 
     test('deveria retornar erro 400 se as o repeat Password não for informado', async () => {
         const sut = createSut();
-        const result = await request(sut).post('/user').send({
+        const result = await request(sut).post(route).send({
             name: 'any_name',
             email: 'any_email@any.com',
             password: 'any_password',
@@ -154,7 +156,7 @@ describe('Testando criação de usuário', () => {
 
     test('deveria retornar erro 400 se as senhas forem divergentes', async () => {
         const sut = createSut();
-        const result = await request(sut).post('/user').send({
+        const result = await request(sut).post(route).send({
             name: 'any_name',
             email: 'any_email@any.com',
             password: 'any_password',
@@ -177,7 +179,7 @@ describe('Testando criação de usuário', () => {
             'any_password'
         );
         await createUser(user);
-        const result = await request(sut).post('/user').send({
+        const result = await request(sut).post(route).send({
             name: 'any_name',
             email: 'any_email@teste.com',
             password: 'any_password',
@@ -201,7 +203,7 @@ describe('Testando criação de usuário', () => {
         );
         await createUser(user);
 
-        const result = await request(sut).post('/user').send({
+        const result = await request(sut).post(route).send({
             name: 'newUser',
             email: 'newemail@teste.com',
             password: '12345',
@@ -213,5 +215,26 @@ describe('Testando criação de usuário', () => {
         expect(result.body.ok).toBe(true);
         expect(result.body.message).toBe('User created successfully');
         expect(result.body).toHaveProperty('data');
+    });
+
+    test('deveria retornar 500 se o usecase disparar uma exceção', async () => {
+        const sut = createSut();
+        jest.spyOn(CreateUserUsecase.prototype, 'execute').mockRejectedValue(
+            'Simulated Error'
+        );
+        const result = await request(sut).post(route).send({
+            name: 'newUser',
+            email: 'newemail@teste.com',
+            password: '12345',
+            repeatPassword: '12345',
+        });
+
+        expect(result).toBeDefined();
+        expect(result.status).toEqual(500);
+        expect(result).toHaveProperty('body');
+        expect(result.body).toHaveProperty('ok', false);
+        expect(result.body).toHaveProperty('message', 'Simulated Error');
+        expect(result.body).not.toHaveProperty('data');
+        expect(result.body).not.toHaveProperty('code');
     });
 });
